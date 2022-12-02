@@ -1,0 +1,6 @@
+http://example.com/2022/12/02/first-blog/
+http://example.com/slides/index.html
+http://example.com/tags/index-1.html
+http://example.com/tags/index.html
+http://example.com/
+http://example.com/tags/casual/
