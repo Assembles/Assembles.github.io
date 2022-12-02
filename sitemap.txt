@@ -1,6 +1,9 @@
+http://example.com/2022/12/03/CMU15445-lab1/
+http://example.com/2022/12/03/CMU15445-lab0/
 http://example.com/2022/12/02/first-blog/
 http://example.com/slides/index.html
 http://example.com/tags/index-1.html
 http://example.com/tags/index.html
 http://example.com/
 http://example.com/tags/casual/
+http://example.com/tags/CMU15445/

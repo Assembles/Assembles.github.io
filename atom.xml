@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2022-12-02T11:15:43.097Z</updated>
+  <updated>2022-12-02T16:49:08.661Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,19 +17,62 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>CMU15445-lab1</title>
+    <link href="http://example.com/2022/12/03/CMU15445-lab1/"/>
+    <id>http://example.com/2022/12/03/CMU15445-lab1/</id>
+    <published>2022-12-02T16:45:29.000Z</published>
+    <updated>2022-12-02T16:49:08.661Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="buffer-pool-manager"><a href="#buffer-pool-manager" class="headerlink" title="buffer pool manager"></a>buffer pool manager</h1><p>这个实验比较简单，讲的是在底层的页级别的读写是怎么做的</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;buffer-pool-manager&quot;&gt;&lt;a href=&quot;#buffer-pool-manager&quot; class=&quot;headerlink&quot; title=&quot;buffer pool manager&quot;&gt;&lt;/a&gt;buffer pool manager&lt;/h1&gt;&lt;p&gt;这个</summary>
+      
+    
+    
+    
+    
+    <category term="CMU15445" scheme="http://example.com/tags/CMU15445/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>CMU15445 lab0</title>
+    <link href="http://example.com/2022/12/03/CMU15445-lab0/"/>
+    <id>http://example.com/2022/12/03/CMU15445-lab0/</id>
+    <published>2022-12-02T16:25:11.000Z</published>
+    <updated>2022-12-02T16:42:30.382Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="先从环境配置讲起"><a href="#先从环境配置讲起" class="headerlink" title="先从环境配置讲起"></a>先从环境配置讲起</h2><p>按照项目github地址或是课程指导书地址，配置工程文件。这里我选择的是用docker来配置项目。我是在windows上写的，每次写代码之前先启动docker desktop，配置的时候有共享的文件夹，所以可以在windows下的vscode里写代码，然后在命令行切到docker容器里make &amp; test</p><h2 id="vscode的显示问题"><a href="#vscode的显示问题" class="headerlink" title="vscode的显示问题"></a>vscode的显示问题</h2><p>vscode有可能有两个可能出问题的地方，一是windows环境里没有c++的库文件，这个问题可以通过下载mingw解决，另一个是代码提示可能出问题要手动在设置里把c++默认版本调到11以上</p><h2 id="git的使用"><a href="#git的使用" class="headerlink" title="git的使用"></a>git的使用</h2><p>略（这个项目用到的也就push pull）</p><h2 id="c-基础"><a href="#c-基础" class="headerlink" title="c++基础"></a>c++基础</h2><p>还在恶补c++ primer。。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h2 id=&quot;先从环境配置讲起&quot;&gt;&lt;a href=&quot;#先从环境配置讲起&quot; class=&quot;headerlink&quot; title=&quot;先从环境配置讲起&quot;&gt;&lt;/a&gt;先从环境配置讲起&lt;/h2&gt;&lt;p&gt;按照项目github地址或是课程指导书地址，配置工程文件。这里我选择的是用docker来配置</summary>
+      
+    
+    
+    
+    
+    <category term="CMU15445" scheme="http://example.com/tags/CMU15445/"/>
+    
+  </entry>
+  
+  <entry>
     <title>first blog</title>
     <link href="http://example.com/2022/12/02/first-blog/"/>
     <id>http://example.com/2022/12/02/first-blog/</id>
     <published>2022-12-02T10:47:05.000Z</published>
-    <updated>2022-12-02T11:15:43.097Z</updated>
+    <updated>2022-12-02T16:18:59.846Z</updated>
     
-    <content type="html"><![CDATA[<p>first blog!<br>刚开始尝试写博客。。主要是为了记录下数据库实验，方便以后回来查找</p>]]></content>
+    <content type="html"><![CDATA[<h1 id="first-blog"><a href="#first-blog" class="headerlink" title="first blog!"></a>first blog!</h1><p>第一次尝试写博客。。主要是为了记录下最近在做的数据库实验，方便以后回来查找<br>后面有机会的话可能会把看的论文和写的项目顺便更新上来？</p>]]></content>
     
     
       
       
-    <summary type="html">&lt;p&gt;first blog!&lt;br&gt;刚开始尝试写博客。。主要是为了记录下数据库实验，方便以后回来查找&lt;/p&gt;
-</summary>
+    <summary type="html">&lt;h1 id=&quot;first-blog&quot;&gt;&lt;a href=&quot;#first-blog&quot; class=&quot;headerlink&quot; title=&quot;first blog!&quot;&gt;&lt;/a&gt;first blog!&lt;/h1&gt;&lt;p&gt;第一次尝试写博客。。主要是为了记录下最近在做的数据库实验，方便以后回来查</summary>
       
     
     
