@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-02-07T21:36:07.114Z</updated>
+  <updated>2023-02-07T21:49:53.863Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,13 +17,35 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>CMU15445-lab2</title>
-    <link href="http://example.com/2023/02/08/CMU15445-lab2/"/>
-    <id>http://example.com/2023/02/08/CMU15445-lab2/</id>
-    <published>2023-02-07T18:59:13.000Z</published>
-    <updated>2023-02-07T21:36:07.114Z</updated>
+    <title>CMU15445-lab3</title>
+    <link href="http://example.com/2023/02/08/CMU15445-lab3/"/>
+    <id>http://example.com/2023/02/08/CMU15445-lab3/</id>
+    <published>2023-02-07T21:47:12.000Z</published>
+    <updated>2023-02-07T21:49:53.863Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="Extendible-Hashing-Index"><a href="#Extendible-Hashing-Index" class="headerlink" title="Extendible Hashing Index"></a>Extendible Hashing Index</h1><p>这个实验难度比较高，前前后后改了很久很久的bug。。。主要的问题就是对这个可扩展哈希的概念理解的不够，虽然反复看了很多遍但是最后在写的时候在测试时遇到bug才可能知道自己错在哪，有的bug涉及到内存泄漏还很难搞，最后一次提交几乎是重写了一遍，总共在测试网站上提交了80多次，总算通过了全部测试。说起来这个课程好像有配套的教材，有时间可以瞄一眼，感觉很多设计看网站上的指导很模糊&#x3D; &#x3D;</p><h2 id="Task1-Page-Layout"><a href="#Task1-Page-Layout" class="headerlink" title="Task1 Page Layout"></a>Task1 Page Layout</h2><p>page分为两种，第一种为Hash Table Directory Page, 第二种为Hash Table Bucket Page，也就是目录页以及具体存tuple的页</p><h2 id="Task2-Hash-Table-Implementation"><a href="#Task2-Hash-Table-Implementation" class="headerlink" title="Task2 Hash Table Implementation"></a>Task2 Hash Table Implementation</h2><p>首先最基础的是Getvalue，这个函数很容易就能实现<br>然后是insert和remove，这两个函数理论上和getvalue同理，但是因为是可扩展哈希，这两个方法还涉及到split和merge，相应地也包含directory的grow和shrink，<br>以insert为例，如果是简单的插入的话只需要找到对应的bucketpage，然后用buffer pool manager中实现过的方法就能够实现读取，再对读取到的页进行插入操作即可，但是如果当前要插入的页已经满了的话，就需要分裂，容易想到，这是一个递归的过程，如果第二次分裂后的结果依然是所有的元素在一个桶中，那么分裂仍然要进行下去。<br>分两种情况，待分裂的桶的localdepth等于globaldepth，这种情况下需要directory double。如果小于，那么直接找对应的split image即可。等于的情况下实现起来的一个好处就是如果深度相等，那么只需要处理这个桶和新的桶两个桶的关系，其他的保留即可。小于的情况下是多对一的情况，需要多对一重新映射<br>merge也是一样的道理，需要递归地去操作，但是这里最开始有个错误卡了很久，最后查到是对概念理解出现了问题导致代码的原理出错了。</p><h2 id="Task3-Concurrency-Control"><a href="#Task3-Concurrency-Control" class="headerlink" title="Task3 Concurrency Control"></a>Task3 Concurrency Control</h2><p>这里有两种锁，lock和latch，其中lock对hash table锁，我理解是一个比较大的层面上的锁，latch则是对每个bucket page的锁</p>]]></content>
+    <content type="html"><![CDATA[<h1 id="Query-Execution"><a href="#Query-Execution" class="headerlink" title="Query Execution"></a>Query Execution</h1><p>这个实验主要是需要完成一些简单的executor，这里需要简单地了解下迭代器模型，是比较常见的数据库指令运行的模式</p><h2 id="Task1-Executors"><a href="#Task1-Executors" class="headerlink" title="Task1 Executors"></a>Task1 Executors</h2>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;Query-Execution&quot;&gt;&lt;a href=&quot;#Query-Execution&quot; class=&quot;headerlink&quot; title=&quot;Query Execution&quot;&gt;&lt;/a&gt;Query Execution&lt;/h1&gt;&lt;p&gt;这个实验主要是需要完成一些简单的ex</summary>
+      
+    
+    
+    
+    
+    <category term="“CMU15445&quot;" scheme="http://example.com/tags/%E2%80%9CCMU15445/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>CMU15445-lab2</title>
+    <link href="http://example.com/2022/12/20/CMU15445-lab2/"/>
+    <id>http://example.com/2022/12/20/CMU15445-lab2/</id>
+    <published>2022-12-19T18:59:13.000Z</published>
+    <updated>2023-02-07T21:47:51.589Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Extendible-Hashing-Index"><a href="#Extendible-Hashing-Index" class="headerlink" title="Extendible Hashing Index"></a>Extendible Hashing Index</h1><p>这个实验难度比较高，前前后后改了很久很久的bug。。。主要的问题就是对这个可扩展哈希的概念理解的不够，虽然反复看了很多遍但是最后在写的时候在测试时遇到bug才可能知道自己错在哪，有的bug涉及到内存泄漏还很难搞，最后一次提交几乎是重写了一遍，总共在测试网站上提交了80多次，总算通过了全部测试。说起来这个课程好像有配套的教材，有时间可以瞄一眼，感觉很多设计看网站上的指导很模糊&#x3D; &#x3D;<br>关于零长数组可以参考这篇<a href="https://blog.csdn.net/gatieme/article/details/64131322">blog</a></p><h2 id="Task1-Page-Layout"><a href="#Task1-Page-Layout" class="headerlink" title="Task1 Page Layout"></a>Task1 Page Layout</h2><p>page分为两种，第一种为Hash Table Directory Page, 第二种为Hash Table Bucket Page，也就是目录页以及具体存tuple的页<br>Bucket page需要实现的部分中主要需要理解occupied和readable成员的含义，occupied的含义是某个位是否被使用过，readable的含义是某个位当前是否存在元素，时间维度上不同，occupied用处不大，感觉可以不用</p><h2 id="Task2-Hash-Table-Implementation"><a href="#Task2-Hash-Table-Implementation" class="headerlink" title="Task2 Hash Table Implementation"></a>Task2 Hash Table Implementation</h2><p>首先最基础的是Getvalue，这个函数很容易就能实现<br>然后是insert和remove，这两个函数理论上和getvalue同理，但是因为是可扩展哈希，这两个方法还涉及到split和merge，相应地也包含directory的grow和shrink，<br>以insert为例，如果是简单的插入的话只需要找到对应的bucketpage，然后用buffer pool manager中实现过的方法就能够实现读取，再对读取到的页进行插入操作即可，但是如果当前要插入的页已经满了的话，就需要分裂，容易想到，这是一个递归的过程，如果第二次分裂后的结果依然是所有的元素在一个桶中，那么分裂仍然要进行下去。<br>分两种情况，待分裂的桶的localdepth等于globaldepth，这种情况下需要directory double。如果小于，那么直接找对应的split image即可。等于的情况下实现起来的一个好处就是如果深度相等，那么只需要处理这个桶和新的桶两个桶的关系，其他的保留即可。小于的情况下是多对一的情况，需要多对一重新映射<br>merge也是一样的道理，需要递归地去操作，但是这里最开始有个错误卡了很久，最后查到是对概念理解出现了问题导致代码的原理出错了。</p><h2 id="Task3-Concurrency-Control"><a href="#Task3-Concurrency-Control" class="headerlink" title="Task3 Concurrency Control"></a>Task3 Concurrency Control</h2><p>这里有两种锁，lock和latch，其中lock对hash table锁，我理解是一个比较大的层面上的锁，latch则是对每个bucket page的锁</p>]]></content>
     
     
       
@@ -34,6 +56,8 @@
     
     
     
+    <category term="CMU15445" scheme="http://example.com/tags/CMU15445/"/>
+    
   </entry>
   
   <entry>
@@ -41,9 +65,9 @@
     <link href="http://example.com/2022/12/03/CMU15445-lab1/"/>
     <id>http://example.com/2022/12/03/CMU15445-lab1/</id>
     <published>2022-12-02T16:45:29.000Z</published>
-    <updated>2023-02-07T18:54:21.238Z</updated>
+    <updated>2023-02-07T21:36:43.434Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="buffer-pool-manager"><a href="#buffer-pool-manager" class="headerlink" title="buffer pool manager"></a>buffer pool manager</h1><p>这个实验比较简单，讲的是在底层的页级别的读写是怎么做的，一共有三个实验：LRU Replacement Policy, Buffer Pool Manager Instance, Parrallel Buffer Pool Manager，难度大概是2&gt;1&gt;3<br>在开始之前首先需要想清楚这个实验要做的是什么，第一个任务实现了一个Replacer，这个Replacer票选出哪一个内存中的块可以被换出，第二个任务就是在此基础上进一步实现，第三个任务与多线程相关。。</p><h2 id="Task1-LRU-Replacement-Policy"><a href="#Task1-LRU-Replacement-Policy" class="headerlink" title="Task1 LRU Replacement Policy"></a>Task1 LRU Replacement Policy</h2><p>这个任务可以主要工作就是实现一个LRU，双端链表+哈希表就可以，相关的方法也就是LRU的接口的另一种表达</p><h2 id="Task2-Buffer-Pool-Manager-Instance"><a href="#Task2-Buffer-Pool-Manager-Instance" class="headerlink" title="Task2 Buffer Pool Manager Instance"></a>Task2 Buffer Pool Manager Instance</h2><p>这个任务比较有难度，六个接口，这些接口的功能我怀疑有些测试也没有完全测试到。<br>课程网站上有一段话说的比较好，这里摘抄一下：</p><blockquote><p>Note: Pin and Unpin within the contexts of the LRUReplacer and the BufferPoolManagerInstance have inverse meanings. Within the context of the LRUReplacer, pinning a page implies that we shouldn’t evict the page because it is in use. This means we should remove it from the LRUReplacer. On the other hand, pinning a page in the BufferPoolManagerInstance implies that we want to use a page, and that it should not be removed from the buffer pool.<br>在LRU中，pin意味着某个页在使用，所以不能把他再留在Replacer中，因为Replacer中的是留着等待换出的，在BufferPoolManagerInstance中，pin的意思是在使用中，所以这个页还不能被移出Pool<br>这里的难点一方面是page数据结构里面的变量比较多，需要注意设置的变量比较多，需要注意点，另外一方面是需要注意这个数据结构，page_table_  std::unordered_map&lt;page_id_t, frame_id_t&gt;,从page_id映射到frame_id，具体两者的关系可以看图<br><img src="/../picture/buffer_pool_manager.png" alt="page-&gt;frame"></p></blockquote><h2 id="Task3-Parallel-Buffer-Pool-Manager"><a href="#Task3-Parallel-Buffer-Pool-Manager" class="headerlink" title="Task3 Parallel Buffer Pool Manager"></a>Task3 Parallel Buffer Pool Manager</h2><p>这个就比较简单了，调用下之前实现了的接口就可以了，主要需要写的代码就是新加入的页应该加入哪个buffer pool，这个按照教程写就可以了（这里我感觉我写的错了但是还是通过了全部测试，很奇怪</p>]]></content>
+    <content type="html"><![CDATA[<h1 id="buffer-pool-manager"><a href="#buffer-pool-manager" class="headerlink" title="buffer pool manager"></a>buffer pool manager</h1><p>这个实验比较简单，讲的是在底层的页级别的读写是怎么做的，一共有三个实验：LRU Replacement Policy, Buffer Pool Manager Instance, Parrallel Buffer Pool Manager，难度大概是2&gt;1&gt;3<br>在开始之前首先需要想清楚这个实验要做的是什么，第一个任务实现了一个Replacer，这个Replacer票选出哪一个内存中的块可以被换出，第二个任务就是在此基础上进一步实现，第三个任务与多线程相关。。</p><h2 id="Task1-LRU-Replacement-Policy"><a href="#Task1-LRU-Replacement-Policy" class="headerlink" title="Task1 LRU Replacement Policy"></a>Task1 LRU Replacement Policy</h2><p>这个任务可以主要工作就是实现一个LRU，双端链表+哈希表就可以，相关的方法也就是LRU的接口的另一种表达</p><h2 id="Task2-Buffer-Pool-Manager-Instance"><a href="#Task2-Buffer-Pool-Manager-Instance" class="headerlink" title="Task2 Buffer Pool Manager Instance"></a>Task2 Buffer Pool Manager Instance</h2><p>这个任务比较有难度，六个接口，这些接口的功能我怀疑有些测试也没有完全测试到。<br>课程网站上有一段话说的比较好，这里摘抄一下：</p><blockquote><p>Note: Pin and Unpin within the contexts of the LRUReplacer and the BufferPoolManagerInstance have inverse meanings. Within the context of the LRUReplacer, pinning a page implies that we shouldn’t evict the page because it is in use. This means we should remove it from the LRUReplacer. On the other hand, pinning a page in the BufferPoolManagerInstance implies that we want to use a page, and that it should not be removed from the buffer pool.</p></blockquote><p>在LRU中，pin意味着某个页在使用，所以不能把他再留在Replacer中，因为Replacer中的是留着等待换出的，在BufferPoolManagerInstance中，pin的意思是在使用中，所以这个页还不能被移出Pool<br>这里的难点一方面是page数据结构里面的变量比较多，需要注意设置的变量比较多，需要注意点，另外一方面是需要注意这个数据结构，page_table_  std::unordered_map&lt;page_id_t, frame_id_t&gt;,从page_id映射到frame_id，具体两者的关系可以看图<br><img src="/../picture/buffer_pool_manager.png" alt="page-&gt;frame"></p><h2 id="Task3-Parallel-Buffer-Pool-Manager"><a href="#Task3-Parallel-Buffer-Pool-Manager" class="headerlink" title="Task3 Parallel Buffer Pool Manager"></a>Task3 Parallel Buffer Pool Manager</h2><p>这个就比较简单了，调用下之前实现了的接口就可以了，主要需要写的代码就是新加入的页应该加入哪个buffer pool，这个按照教程写就可以了（这里我感觉我写的错了但是还是通过了全部测试，很奇怪</p>]]></content>
     
     
       
@@ -63,9 +87,9 @@
     <link href="http://example.com/2022/12/03/CMU15445-lab0/"/>
     <id>http://example.com/2022/12/03/CMU15445-lab0/</id>
     <published>2022-12-02T16:25:11.000Z</published>
-    <updated>2022-12-08T13:06:30.776Z</updated>
+    <updated>2023-02-07T21:53:14.509Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="先从环境配置讲起"><a href="#先从环境配置讲起" class="headerlink" title="先从环境配置讲起"></a>先从环境配置讲起</h2><p>按照项目github地址或是课程指导书地址，配置工程文件。这里我选择的是用docker来配置项目。我是在windows上写的，每次写代码之前先启动docker desktop，配置的时候有共享的文件夹，所以可以在windows下的vscode里写代码，然后在命令行切到docker容器里make &amp; test</p><h2 id="vscode的显示问题"><a href="#vscode的显示问题" class="headerlink" title="vscode的显示问题"></a>vscode的显示问题</h2><p>vscode有可能有两个可能出问题的地方，一是windows环境里没有c++的库文件，这个问题可以通过下载mingw解决，另一个是代码提示可能出问题要手动在设置里把c++默认版本调到11以上</p><h2 id="git的使用"><a href="#git的使用" class="headerlink" title="git的使用"></a>git的使用</h2><p>略（这个项目用到的也就push pull）</p><h2 id="c-基础"><a href="#c-基础" class="headerlink" title="c++基础"></a>c++基础</h2><p>还在恶补c++ primer。。</p>]]></content>
+    <content type="html"><![CDATA[<h2 id="先从环境配置讲起"><a href="#先从环境配置讲起" class="headerlink" title="先从环境配置讲起"></a>先从环境配置讲起</h2><p>按照项目github地址或是课程指导书地址，配置工程文件。这里我选择的是用docker来配置项目。我是在windows上写的，每次写代码之前先启动docker desktop，配置的时候有共享的文件夹，所以可以在windows下的vscode里写代码，然后在命令行切到docker容器里make &amp; test</p><h2 id="vscode的显示问题"><a href="#vscode的显示问题" class="headerlink" title="vscode的显示问题"></a>vscode的显示问题</h2><p>vscode有可能有两个可能出问题的地方，一是windows环境里没有c++的库文件，这个问题可以通过下载mingw解决，另一个是代码提示可能出问题要手动在设置里把c++默认版本调到11以上</p><h2 id="git的使用"><a href="#git的使用" class="headerlink" title="git的使用"></a>git的使用</h2><p>略（这个项目用到的也就push pull）</p><h2 id="c-基础"><a href="#c-基础" class="headerlink" title="c++基础"></a>c++基础</h2><p>还在恶补c++ primer。。</p><h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p>数据库教学整体结构可以参考这幅图，实验内容大致是从底向上但是不完全相同<img src="/../picture/hierarchy.png" alt="结构"></p>]]></content>
     
     
       
