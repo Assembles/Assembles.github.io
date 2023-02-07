@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2022-12-08T13:16:49.991Z</updated>
+  <updated>2023-02-07T19:17:48.512Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,13 +17,33 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>CMU15445-lab2</title>
+    <link href="http://example.com/2023/02/08/CMU15445-lab2/"/>
+    <id>http://example.com/2023/02/08/CMU15445-lab2/</id>
+    <published>2023-02-07T18:59:13.000Z</published>
+    <updated>2023-02-07T19:17:48.512Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Extendible-Hashing-Index"><a href="#Extendible-Hashing-Index" class="headerlink" title="Extendible Hashing Index"></a>Extendible Hashing Index</h1><p>这个实验难度比较高，前前后后改了很久很久的bug。。。主要的问题就是对这个可扩展哈希的概念理解的不够，虽然反复看了很多遍但是最后在写的时候在测试时遇到bug才可能知道自己错在哪，有的bug涉及到内存泄漏还很难搞，最后一次提交几乎是重写了一遍，总共在测试网站上提交了80多次，总算通过了全部测试。说起来这个课程好像有配套的教材，有时间可以瞄一眼，感觉很多设计看网站上的指导很模糊&#x3D; &#x3D;</p><h2 id="Task1-Page-Layout"><a href="#Task1-Page-Layout" class="headerlink" title="Task1 Page Layout"></a>Task1 Page Layout</h2><p>page分为两种，第一种为Hash Table Directory Page, 第二种为Hash Table Bucket Page，也就是目录页以及具体存tuple的页</p><h2 id="Task2-Hash-Table-Implementation"><a href="#Task2-Hash-Table-Implementation" class="headerlink" title="Task2 Hash Table Implementation"></a>Task2 Hash Table Implementation</h2><h2 id="Task3-Concurrency-Control"><a href="#Task3-Concurrency-Control" class="headerlink" title="Task3 Concurrency Control"></a>Task3 Concurrency Control</h2>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;Extendible-Hashing-Index&quot;&gt;&lt;a href=&quot;#Extendible-Hashing-Index&quot; class=&quot;headerlink&quot; title=&quot;Extendible Hashing Index&quot;&gt;&lt;/a&gt;Extendible Has</summary>
+      
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
     <title>lab1</title>
     <link href="http://example.com/2022/12/03/CMU15445-lab1/"/>
     <id>http://example.com/2022/12/03/CMU15445-lab1/</id>
     <published>2022-12-02T16:45:29.000Z</published>
-    <updated>2022-12-08T13:16:49.991Z</updated>
+    <updated>2023-02-07T18:54:21.238Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="buffer-pool-manager"><a href="#buffer-pool-manager" class="headerlink" title="buffer pool manager"></a>buffer pool manager</h1><p>这个实验比较简单，讲的是在底层的页级别的读写是怎么做的，一共有三个实验：LRU Replacement Policy, Buffer Pool Manager Instance, Parrallel Buffer Pool Manager，难度大概是2&gt;1&gt;3<br>在开始之前首先需要想清楚这个实验要做的是什么，第一个任务实现了一个Replacer，这个Replacer票选出哪一个内存中的块可以被换出，第二个任务就是在此基础上进一步实现，第三个任务与多线程相关。。</p><h2 id="Task1-LRU-Replacement-Policy"><a href="#Task1-LRU-Replacement-Policy" class="headerlink" title="Task1 LRU Replacement Policy"></a>Task1 LRU Replacement Policy</h2><p>这个任务可以主要工作就是实现一个LRU，双端链表+哈希表就可以，相关的方法也就是LRU的接口的另一种表达</p><h2 id="Task2-Buffer-Pool-Manager-Instance"><a href="#Task2-Buffer-Pool-Manager-Instance" class="headerlink" title="Task2 Buffer Pool Manager Instance"></a>Task2 Buffer Pool Manager Instance</h2><p>这个任务比较有难度，六个接口，这些接口的功能我怀疑有些测试也没有完全测试到。<br>课程网站上有一段话说的比较好，这里摘抄一下：</p><blockquote><p>Note: Pin and Unpin within the contexts of the LRUReplacer and the BufferPoolManagerInstance have inverse meanings. Within the context of the LRUReplacer, pinning a page implies that we shouldn’t evict the page because it is in use. This means we should remove it from the LRUReplacer. On the other hand, pinning a page in the BufferPoolManagerInstance implies that we want to use a page, and that it should not be removed from the buffer pool.<br>在LRU中，pin意味着某个页在使用，所以不能把他再留在Replacer中，因为Replacer中的是留着等待换出的，在BufferPoolManagerInstance中，pin的意思是在使用中，所以这个页还不能被移出Pool</p></blockquote><h2 id="Task3-Parallel-Buffer-Pool-Manager"><a href="#Task3-Parallel-Buffer-Pool-Manager" class="headerlink" title="Task3 Parallel Buffer Pool Manager"></a>Task3 Parallel Buffer Pool Manager</h2><p>这个就比较简单了，调用下之前实现了的接口就可以了</p>]]></content>
+    <content type="html"><![CDATA[<h1 id="buffer-pool-manager"><a href="#buffer-pool-manager" class="headerlink" title="buffer pool manager"></a>buffer pool manager</h1><p>这个实验比较简单，讲的是在底层的页级别的读写是怎么做的，一共有三个实验：LRU Replacement Policy, Buffer Pool Manager Instance, Parrallel Buffer Pool Manager，难度大概是2&gt;1&gt;3<br>在开始之前首先需要想清楚这个实验要做的是什么，第一个任务实现了一个Replacer，这个Replacer票选出哪一个内存中的块可以被换出，第二个任务就是在此基础上进一步实现，第三个任务与多线程相关。。</p><h2 id="Task1-LRU-Replacement-Policy"><a href="#Task1-LRU-Replacement-Policy" class="headerlink" title="Task1 LRU Replacement Policy"></a>Task1 LRU Replacement Policy</h2><p>这个任务可以主要工作就是实现一个LRU，双端链表+哈希表就可以，相关的方法也就是LRU的接口的另一种表达</p><h2 id="Task2-Buffer-Pool-Manager-Instance"><a href="#Task2-Buffer-Pool-Manager-Instance" class="headerlink" title="Task2 Buffer Pool Manager Instance"></a>Task2 Buffer Pool Manager Instance</h2><p>这个任务比较有难度，六个接口，这些接口的功能我怀疑有些测试也没有完全测试到。<br>课程网站上有一段话说的比较好，这里摘抄一下：</p><blockquote><p>Note: Pin and Unpin within the contexts of the LRUReplacer and the BufferPoolManagerInstance have inverse meanings. Within the context of the LRUReplacer, pinning a page implies that we shouldn’t evict the page because it is in use. This means we should remove it from the LRUReplacer. On the other hand, pinning a page in the BufferPoolManagerInstance implies that we want to use a page, and that it should not be removed from the buffer pool.<br>在LRU中，pin意味着某个页在使用，所以不能把他再留在Replacer中，因为Replacer中的是留着等待换出的，在BufferPoolManagerInstance中，pin的意思是在使用中，所以这个页还不能被移出Pool<br>这里的难点一方面是page数据结构里面的变量比较多，需要注意设置的变量比较多，需要注意点，另外一方面是需要注意这个数据结构，page_table_  std::unordered_map&lt;page_id_t, frame_id_t&gt;,从page_id映射到frame_id，具体两者的关系可以看图<br><img src="/../picture/buffer_pool_manager.png" alt="page-&gt;frame"></p></blockquote><h2 id="Task3-Parallel-Buffer-Pool-Manager"><a href="#Task3-Parallel-Buffer-Pool-Manager" class="headerlink" title="Task3 Parallel Buffer Pool Manager"></a>Task3 Parallel Buffer Pool Manager</h2><p>这个就比较简单了，调用下之前实现了的接口就可以了，主要需要写的代码就是新加入的页应该加入哪个buffer pool，这个按照教程写就可以了（这里我感觉我写的错了但是还是通过了全部测试，很奇怪</p>]]></content>
     
     
       
