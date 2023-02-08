@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-02-07T21:49:53.863Z</updated>
+  <updated>2023-02-08T09:00:43.483Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,13 +17,35 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>CMU15445-lab4</title>
+    <link href="http://example.com/2023/02/08/CMU15445-lab4/"/>
+    <id>http://example.com/2023/02/08/CMU15445-lab4/</id>
+    <published>2023-02-08T08:00:05.000Z</published>
+    <updated>2023-02-08T09:00:43.483Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Concurrency-Control"><a href="#Concurrency-Control" class="headerlink" title="Concurrency Control"></a>Concurrency Control</h1><p>这个实验主要就是实现事务上的lock manager，从而能够实现并行的query execution，锁方面需要支持的函数就是上shared lock、exclusive lock、upgrade lock以及解锁</p><h2 id="Task1-Lock-Manager-amp-amp-Task2-Deadlock-Prevention"><a href="#Task1-Lock-Manager-amp-amp-Task2-Deadlock-Prevention" class="headerlink" title="Task1 Lock Manager &amp;&amp; Task2 Deadlock Prevention"></a>Task1 Lock Manager &amp;&amp; Task2 Deadlock Prevention</h2><p>这分成了两个任务，但是这两个任务其实都在同一部分的代码里，需要先考虑下怎么写在一起，因为对并行的理解不是很够，之前多线程的代码写的也不多，这部分主要是参考了别的代码和博客搞定的。每次上锁的时候大致有三件事，设置growing状态，在rid的等待队列里加入申请的txn id，在txn的锁集合加入rid，这三个操作就是task1的任务。task2比较难，需要做死锁预防，用到了wound-wait(“young wait for old”)，这个方法主要的思路就是杀死比当前请求年轻的申请，等待更老的申请,这里看博客上说不需要管granted_字段，直接遍历请求队列，执行上面提到的操作就可以。<br>对于读锁来说，因为其可以共存，所以只需要abort掉新事务的写请求<br>而等待操作较为麻烦，主要需要考虑两方面设计，一方面需要使用条件变量协调多线程，也就是等待的时候wait，unlock的时候notify_all，另外一方面，还需要考虑的一点是在等待结束后当前事务有可能已经被abort掉了，所以还需要单独处理，参考的一些做法是用了goto语句，感觉不太合理，但是这里不再继续深究了，就先保留了</p><h2 id="Task3-Concurrent-Query-Execution"><a href="#Task3-Concurrent-Query-Execution" class="headerlink" title="Task3 Concurrent Query Execution"></a>Task3 Concurrent Query Execution</h2><p>在lab3的基础上加读写锁，有的地方不是很理解，比如insert后才得到rid但是这样就没法对表加锁只能对index加锁，但是也通过了测试。另外还要加上index_write_set的操作，用来回滚，只需要在加索引的时候顺便构造一下就可以了。</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;Concurrency-Control&quot;&gt;&lt;a href=&quot;#Concurrency-Control&quot; class=&quot;headerlink&quot; title=&quot;Concurrency Control&quot;&gt;&lt;/a&gt;Concurrency Control&lt;/h1&gt;&lt;p&gt;这个</summary>
+      
+    
+    
+    
+    
+    <category term="CMU15445" scheme="http://example.com/tags/CMU15445/"/>
+    
+  </entry>
+  
+  <entry>
     <title>CMU15445-lab3</title>
     <link href="http://example.com/2023/02/08/CMU15445-lab3/"/>
     <id>http://example.com/2023/02/08/CMU15445-lab3/</id>
     <published>2023-02-07T21:47:12.000Z</published>
-    <updated>2023-02-07T21:49:53.863Z</updated>
+    <updated>2023-02-08T09:01:00.538Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="Query-Execution"><a href="#Query-Execution" class="headerlink" title="Query Execution"></a>Query Execution</h1><p>这个实验主要是需要完成一些简单的executor，这里需要简单地了解下迭代器模型，是比较常见的数据库指令运行的模式</p><h2 id="Task1-Executors"><a href="#Task1-Executors" class="headerlink" title="Task1 Executors"></a>Task1 Executors</h2>]]></content>
+    <content type="html"><![CDATA[<h1 id="Query-Execution"><a href="#Query-Execution" class="headerlink" title="Query Execution"></a>Query Execution</h1><p>这个实验主要是需要完成一些简单的executor，这里需要简单地了解下迭代器模型中的火山模型，是比较常见的数据库指令运行的模式</p><h2 id="Task1-Executors"><a href="#Task1-Executors" class="headerlink" title="Task1 Executors"></a>Task1 Executors</h2>]]></content>
     
     
       
@@ -87,9 +109,9 @@
     <link href="http://example.com/2022/12/03/CMU15445-lab0/"/>
     <id>http://example.com/2022/12/03/CMU15445-lab0/</id>
     <published>2022-12-02T16:25:11.000Z</published>
-    <updated>2023-02-07T21:53:14.509Z</updated>
+    <updated>2023-02-08T08:06:46.929Z</updated>
     
-    <content type="html"><![CDATA[<h2 id="先从环境配置讲起"><a href="#先从环境配置讲起" class="headerlink" title="先从环境配置讲起"></a>先从环境配置讲起</h2><p>按照项目github地址或是课程指导书地址，配置工程文件。这里我选择的是用docker来配置项目。我是在windows上写的，每次写代码之前先启动docker desktop，配置的时候有共享的文件夹，所以可以在windows下的vscode里写代码，然后在命令行切到docker容器里make &amp; test</p><h2 id="vscode的显示问题"><a href="#vscode的显示问题" class="headerlink" title="vscode的显示问题"></a>vscode的显示问题</h2><p>vscode有可能有两个可能出问题的地方，一是windows环境里没有c++的库文件，这个问题可以通过下载mingw解决，另一个是代码提示可能出问题要手动在设置里把c++默认版本调到11以上</p><h2 id="git的使用"><a href="#git的使用" class="headerlink" title="git的使用"></a>git的使用</h2><p>略（这个项目用到的也就push pull）</p><h2 id="c-基础"><a href="#c-基础" class="headerlink" title="c++基础"></a>c++基础</h2><p>还在恶补c++ primer。。</p><h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p>数据库教学整体结构可以参考这幅图，实验内容大致是从底向上但是不完全相同<img src="/../picture/hierarchy.png" alt="结构"></p>]]></content>
+    <content type="html"><![CDATA[<h2 id="先从环境配置讲起"><a href="#先从环境配置讲起" class="headerlink" title="先从环境配置讲起"></a>先从环境配置讲起</h2><p>按照项目github地址或是课程指导书地址，配置工程文件。这里我选择的是用docker来配置项目。我是在windows上写的，每次写代码之前先启动docker desktop，配置的时候有共享的文件夹，所以可以在windows下的vscode里写代码，然后在命令行切到docker容器里make &amp; test</p><h2 id="vscode的显示问题"><a href="#vscode的显示问题" class="headerlink" title="vscode的显示问题"></a>vscode的显示问题</h2><p>vscode有可能有两个可能出问题的地方，一是windows环境里没有c++的库文件，这个问题可以通过下载mingw解决，另一个是代码提示可能出问题要手动在设置里把c++默认版本调到11以上</p><h2 id="git的使用"><a href="#git的使用" class="headerlink" title="git的使用"></a>git的使用</h2><p>略（这个项目用到的也就push pull）</p><h2 id="c-基础"><a href="#c-基础" class="headerlink" title="c++基础"></a>c++基础</h2><p>还在恶补c++ primer。。</p><h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p>数据库教学整体结构可以参考这幅图，实验内容大致是从底向上但是不完全相同<img src="/../picture/hierarchy.png" alt="结构"></p><h2 id="帮助很大的博客"><a href="#帮助很大的博客" class="headerlink" title="帮助很大的博客"></a>帮助很大的博客</h2><p><a href="https://blog.csdn.net/freedom1523646952/article/details/123056958">https://blog.csdn.net/freedom1523646952/article/details/123056958</a><br><a href="https://blog.csdn.net/twentyonepilots/article/details/120868216">https://blog.csdn.net/twentyonepilots/article/details/120868216</a></p>]]></content>
     
     
       
