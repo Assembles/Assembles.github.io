@@ -1,33 +1,661 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content="6-s081-lab2"><meta name="keywords" content=""><meta name="author" content="Dys"><meta name="copyright" content="Dys"><title>6-s081-lab2 | Dys's Blog</title><link rel="shortcut icon" href="/melody-favicon.ico"><link rel="stylesheet" href="/css/index.css?version=1.9.1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css?version=1.9.1"><meta name="format-detection" content="telephone=no"><meta http-equiv="x-dns-prefetch-control" content="on"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><script>var GLOBAL_CONFIG = { 
-  root: '/',
-  algolia: undefined,
-  localSearch: undefined,
-  copy: {
-    success: 'Copy successfully',
-    error: 'Copy error',
-    noSupport: 'The browser does not support'
-  },
-  hexoVersion: '6.3.0'
-} </script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="Dys's Blog" type="application/atom+xml">
-</head><body><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar" data-display="true"><div class="toggle-sidebar-info text-center"><span data-toggle="Toggle article">Toggle site</span><hr></div><div class="sidebar-toc"><div class="sidebar-toc__title">Catalog</div><div class="sidebar-toc__progress"><span class="progress-notice">You've read</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar"></div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#System-calls"><span class="toc-number">1.</span> <span class="toc-text">System calls</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Tracing"><span class="toc-number">1.1.</span> <span class="toc-text">Tracing</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#step1"><span class="toc-number">1.1.1.</span> <span class="toc-text">step1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step2"><span class="toc-number">1.1.2.</span> <span class="toc-text">step2</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#step3"><span class="toc-number">2.</span> <span class="toc-text">step3</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#step4"><span class="toc-number">2.0.1.</span> <span class="toc-text">step4</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step5"><span class="toc-number">2.0.2.</span> <span class="toc-text">step5</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Sysinfo"><span class="toc-number">3.</span> <span class="toc-text">Sysinfo</span></a></li></ol></div></div><div class="author-info hide"><div class="author-info__avatar text-center"><img src="/img/avatar.png"></div><div class="author-info__name text-center">Dys</div><div class="author-info__description text-center"></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">Articles</span><span class="pull-right">9</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">Tags</span><span class="pull-right">4</span></a></div></div></div><div id="content-outer"><div id="top-container" style="background-image: url(/background.jpg)"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">Dys's Blog</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right"></span></div><div id="post-info"><div id="post-title">6-s081-lab2</div><div id="post-meta"><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2023-03-24</time></div></div></div><div class="layout" id="content-inner"><article id="post"><div class="article-container" id="post-content"><p><img src="/../picture/6.s081lab2/pic2.jpg" alt="高木镇楼"></p>
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Dys">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="System calls上个实验做了几个用户态的调用，这个实验就要开始尝试做系统调用（system call） Tracingtrace能够接受一个参数，mask，这个参数指定需要去trace哪个或者说哪几个系统调用，输出的格式是  pid: name of system call -&gt; return value  另外trace也能追踪调用它的进程的子进程。上面是要求，接下来就是详细的做">
+<meta property="og:type" content="article">
+<meta property="og:title" content="6-s081-lab2">
+<meta property="og:url" content="http://example.com/2023/03/24/6-s081-lab2/index.html">
+<meta property="og:site_name" content="Dys&#39;s Blog">
+<meta property="og:description" content="System calls上个实验做了几个用户态的调用，这个实验就要开始尝试做系统调用（system call） Tracingtrace能够接受一个参数，mask，这个参数指定需要去trace哪个或者说哪几个系统调用，输出的格式是  pid: name of system call -&gt; return value  另外trace也能追踪调用它的进程的子进程。上面是要求，接下来就是详细的做">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/picture/6.s081lab2/pic2.jpg">
+<meta property="og:image" content="http://example.com/picture/6.s081lab2/p1.png">
+<meta property="article:published_time" content="2023-03-23T16:28:36.000Z">
+<meta property="article:modified_time" content="2023-03-24T02:51:49.518Z">
+<meta property="article:author" content="Dys">
+<meta property="article:tag" content="OS">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/picture/6.s081lab2/pic2.jpg">
+  
+  
+  
+  <title>6-s081-lab2 - Dys&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="Dys's Blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Dys Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/../picture/6.s081lab2/pic2.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="6-s081-lab2"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-03-24 00:28" pubdate>
+          2023年3月24日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          17 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">6-s081-lab2</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p><img src="/../picture/6.s081lab2/pic2.jpg" srcset="/img/loading.gif" lazyload alt="高木镇楼"></p>
 <h1 id="System-calls"><a href="#System-calls" class="headerlink" title="System calls"></a>System calls</h1><p>上个实验做了几个用户态的调用，这个实验就要开始尝试做系统调用（system call）</p>
 <h2 id="Tracing"><a href="#Tracing" class="headerlink" title="Tracing"></a>Tracing</h2><p>trace能够接受一个参数，<strong>mask</strong>，这个参数指定需要去trace哪个或者说哪几个系统调用，输出的格式是</p>
 <blockquote>
 <p>pid: name of system call -&gt; return value</p>
 </blockquote>
-<p>另外trace也能追踪调用它的进程的子进程。<br>上面是要求，接下来就是详细的做法，首先观察输出样例：<br><img src="/../picture/6.s081lab2/p1.png" alt="输出样例"><br>第一个用例只trace了read，第二个把31个低位都设置了，第三个调用trace，第四个trace了fork。接下来根据他给的提示来一步步做就可以了</p>
+<p>另外trace也能追踪调用它的进程的子进程。<br>上面是要求，接下来就是详细的做法，首先观察输出样例：<br><img src="/../picture/6.s081lab2/p1.png" srcset="/img/loading.gif" lazyload alt="输出样例"><br>第一个用例只trace了read，第二个把31个低位都设置了，第三个调用trace，第四个trace了fork。接下来根据他给的提示来一步步做就可以了</p>
 <h3 id="step1"><a href="#step1" class="headerlink" title="step1"></a>step1</h3><p>往makefile加trace这一项</p>
 <h3 id="step2"><a href="#step2" class="headerlink" title="step2"></a>step2</h3><p>接下来需要向user&#x2F;user.h,user&#x2F;usys.pl,kernel&#x2F;syscall.h这几个文件里面加东西，仿照原有的代码就可以，这几步的作用就是usys.pl会在make的时候生成usys.S文件，这里看pl文件里的代码就能看到，就是把调用函数编号放到寄存器里然后调用ecall。那么这一步之后，在调用trace的时候，（通过一些很神奇的汇编层面的东西，这里我暂时也解释的不太清楚，感觉就是把函数的定义用汇编写了出来）就会跳到生成的汇编代码里</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.global trace</span><br><span class="line">trace:</span><br><span class="line"> li a7, SYS_trace</span><br><span class="line"> ecall</span><br><span class="line"> ret</span><br></pre></td></tr></table></figure>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs maxima">.global <span class="hljs-built_in">trace</span><br><span class="hljs-built_in">trace</span>:<br> <span class="hljs-built_in">li</span> a7, SYS_trace<br> ecall<br> ret<br></code></pre></td></tr></table></figure>
 <p>然后因为定义了SYS_trace，所以这一步是能够通过编译的，但是实际执行的时候，因为找不到真的系统调用，所以执行的时候还是会失败。</p>
 <h1 id="step3"><a href="#step3" class="headerlink" title="step3"></a>step3</h1><p>这时候就需要把实现加进来，在kernel&#x2F;sysproc.c文件里加sys_trace()函数，这个函数在proc结构体里保存调用的参数。所以首先先去kernel&#x2F;proc.h在proc的结构体里加一个<code>int mask</code>。然后在kernel&#x2F;sysproc.c里加上sys_trace的定义</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">uint64 sys_trace(void)&#123;</span><br><span class="line">  int mask_;</span><br><span class="line">  if(argint(0,&amp;mask_)&lt;0)&#123;</span><br><span class="line">    return -1;</span><br><span class="line">  &#125;</span><br><span class="line">  myproc()-&gt;mask=mask_;</span><br><span class="line">  //printf(&quot;mask %d\n&quot;, mask_);</span><br><span class="line">  return 0; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs angelscript"><span class="hljs-built_in">uint64</span> sys_trace(<span class="hljs-built_in">void</span>)&#123;<br>  <span class="hljs-built_in">int</span> mask_;<br>  <span class="hljs-keyword">if</span>(argint(<span class="hljs-number">0</span>,&amp;mask_)&lt;<span class="hljs-number">0</span>)&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>  &#125;<br>  myproc()-&gt;mask=mask_;<br>  <span class="hljs-comment">//printf(&quot;mask %d\n&quot;, mask_);</span><br>  <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>; <br>&#125;<br></code></pre></td></tr></table></figure>
 <p>提示里面有说syscall.c找得到参数的代码，另外参考上下文中的系统调用，也可以猜出来可以用argint函数，然后把得到的参数放到结构体里。<br>为什么这里参数只能用这样的方式得到呢？我现在的理解是：因为这里是系统调用，涉及到用户态和内核态的切换，参数是传不进来的，这也是为什么sysproc.c里面定义的系统调用都是uint64 xxxx(void)。这里的参数都需要从进程的trapframe上得到。</p>
 <h3 id="step4"><a href="#step4" class="headerlink" title="step4"></a>step4</h3><p>因为还需要调用子进程，去kernel&#x2F;proc.c里面，可以找到copy进程的代码，把<code>np-&gt;mask = p-&gt;mask;</code>也加到里面。这里有一个小小的问题当时写的时候没有想到，就是既然是copy，那么说明默认应该是有值的，结合判定机制，可以猜测应该要初始化成0，但是当时没有注意到，提示里也没有说。这里用到了c语言结构体默认初始化的设置，默认把mask初始化成0了。</p>
 <h3 id="step5"><a href="#step5" class="headerlink" title="step5"></a>step5</h3><p>最后，我们还需要修改一点别的地方的代码。查看kernel&#x2F;syscall.c文件中的void syscall(void)函数，每次ecall调用trap的时候，会调用syscall函数，这个函数首先从a7中得到系统调用编号（因为在usys.pl里把编号放到了a7里面）。然后有一句很重要的话<br><code>p-&gt;trapframe-&gt;a0 = syscalls[num]();</code><br>这句话的作用是：从上面的syscalls数组里，找到num编号对应的系统调用，调用它，然后把返回值放到a0里。也就是说，这里是唯一能接触到所有系统调用的地方，也是想要实现trace必须修改的地方。这里的实现方法就是判断1&lt;&lt;num和p-&gt;mask有没有交集，如果有交集的话，就说明这个系统调用是需要去trace的，那么就应该输出。所以接下来的修改就很简单了，加上一个包含所有系统调用名字的数组，每次判定trace成功的时候输出pid，sys_call_name_，以及a0</p>
 <h1 id="Sysinfo"><a href="#Sysinfo" class="headerlink" title="Sysinfo"></a>Sysinfo</h1><p>这个实验需要加一个系统调用，sysinfo，收集当前正在运行的系统的相关数据</p>
-</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">Dys</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://example.com/2023/03/24/6-s081-lab2/">http://example.com/2023/03/24/6-s081-lab2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="post-meta__tag-list"></div><nav id="pagination"><div class="next-post pull-right"><a href="/2023/03/14/6-s081-lab1/"><span>6.s081-lab1-util</span><i class="fa fa-chevron-right"></i></a></div></nav></div></div><footer class="footer-bg" style="background-image: url(/background.jpg)"><div class="layout" id="footer"><div class="copyright">&copy;2013 - 2023 By Dys</div><div class="framework-info"><span>Driven - </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span class="footer-separator">|</span><span>Theme - </span><a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/hexo-theme-melody"><span>Melody</span></a></div><div class="busuanzi"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_page_pv"><i class="fa fa-file"></i><span id="busuanzi_value_page_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="https://cdn.jsdelivr.net/npm/animejs@latest/lib/anime.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@latest/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-ui-pack@latest/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.9.1"></script><script src="/js/fancybox.js?version=1.9.1"></script><script src="/js/sidebar.js?version=1.9.1"></script><script src="/js/copy.js?version=1.9.1"></script><script src="/js/fireworks.js?version=1.9.1"></script><script src="/js/transition.js?version=1.9.1"></script><script src="/js/scroll.js?version=1.9.1"></script><script src="/js/head.js?version=1.9.1"></script><script>if(/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(navigator.userAgent)) {
-  $('#nav').addClass('is-mobile')
-  $('footer').addClass('is-mobile')
-  $('#top-container').addClass('is-mobile')
-}</script></body></html>
+<h2 id="顺手写在这里"><a href="#顺手写在这里" class="headerlink" title="顺手写在这里"></a>顺手写在这里</h2><p>记录下每个tag颜色的配置方法，方便后面回来查</p>
+<div class="note note-primary">
+            <p>文字 或者 <code>markdown</code> 均可</p>
+          </div>
+<div class="note note-secondary">
+            <p>文字 或者 <code>markdown</code> 均可</p>
+          </div>
+<div class="note note-success">
+            <p>文字 或者 <code>markdown</code> 均可</p>
+          </div>
+<div class="note note-danger">
+            <p>文字 或者 <code>markdown</code> 均可</p>
+          </div>
+<div class="note note-warning">
+            <p>文字 或者 <code>markdown</code> 均可</p>
+          </div>
+<div class="note note-info">
+            <p>文字 或者 <code>markdown</code> 均可</p>
+          </div>
+<div class="note note-light">
+            <p>文字 或者 <code>markdown</code> 均可</p>
+          </div>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/OS/">#OS</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>6-s081-lab2</div>
+      <div>http://example.com/2023/03/24/6-s081-lab2/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Dys</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年3月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/03/14/6-s081-lab1/" title="6.s081-lab1-util">
+                        <span class="hidden-mobile">6.s081-lab1-util</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

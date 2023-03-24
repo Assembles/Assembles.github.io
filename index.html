@@ -1,67 +1,702 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta name="description" content=""><meta name="keywords" content=""><meta name="author" content="Dys"><meta name="copyright" content="Dys"><title>Dys's Blog</title><link rel="shortcut icon" href="/melody-favicon.ico"><link rel="stylesheet" href="/css/index.css?version=1.9.1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css?version=1.9.1"><meta name="format-detection" content="telephone=no"><meta http-equiv="x-dns-prefetch-control" content="on"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><script>var GLOBAL_CONFIG = { 
-  root: '/',
-  algolia: undefined,
-  localSearch: undefined,
-  copy: {
-    success: 'Copy successfully',
-    error: 'Copy error',
-    noSupport: 'The browser does not support'
-  },
-  hexoVersion: '6.3.0'
-} </script><meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="Dys's Blog" type="application/atom+xml">
-</head><body><i class="fa fa-arrow-right" id="toggle-sidebar" aria-hidden="true"></i><div id="sidebar" data-display="false"><div class="author-info"><div class="author-info__avatar text-center"><img src="/img/avatar.png"></div><div class="author-info__name text-center">Dys</div><div class="author-info__description text-center"></div><hr><div class="author-info-articles"><a class="author-info-articles__archives article-meta" href="/archives"><span class="pull-left">Articles</span><span class="pull-right">9</span></a><a class="author-info-articles__tags article-meta" href="/tags"><span class="pull-left">Tags</span><span class="pull-right">4</span></a></div></div></div><nav id="nav" style="background-image: url(/background.jpg)"><div id="page-header"><span class="pull-left"> <a id="site-name" href="/">Dys's Blog</a></span><i class="fa fa-bars toggle-menu pull-right" aria-hidden="true"></i><span class="pull-right"></span></div><div id="site-info"><div id="site-title">Dys's Blog</div><div id="site-sub-title"></div></div></nav><div id="content-outer"><div class="layout" id="content-inner"><div class="recent-post-item article-container"><a class="article-title" href="/2023/03/24/6-s081-lab2/">6-s081-lab2</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2023-03-24</time><div class="content"><p><img src="/../picture/6.s081lab2/pic2.jpg" alt="高木镇楼"></p>
-<h1 id="System-calls"><a href="#System-calls" class="headerlink" title="System calls"></a>System calls</h1><p>上个实验做了几个用户态的调用，这个实验就要开始尝试做系统调用（system call）</p>
-<h2 id="Tracing"><a href="#Tracing" class="headerlink" title="Tracing"></a>Tracing</h2><p>trace能够接受一个参数，<strong>mask</strong>，这个参数指定需要去trace哪个或者说哪几个系统调用，输出的格式是</p>
-<blockquote>
-<p>pid: name of system call -&gt; return value</p>
-</blockquote>
-<p>另外trace也能追踪调用它的进程的子进程。<br>上面是要求，接下来就是详细的做法，首先观察输出样例：<br><img src="/../picture/6.s081lab2/p1.png" alt="输出样例"><br>第一个用例只trace了read，第二个把31个低位都设置了，第三个调用trace，第四个trace了fork。接下来根据他给的提示来一步步做就可以了</p>
-<h3 id="step1"><a href="#step1" class="headerlink" title="step1"></a>step1</h3><p>往makefile加trace这一项</p>
-<h3 id="step2"><a href="#step2" class="headerlink" title="step2"></a>step2</h3><p>接下来需要向user&#x2F;user.h,user&#x2F;usys.pl,kernel&#x2F;syscall.h这几个文件里面加东西，仿照原有的代码就可以，这几步的作用就是usys.pl会在make的时候生成usys.S文件，这里看pl文件里的代码就能看到，就是把调用函数编号放到寄存器里然后调用ecall。那么这一步之后，在调用trace的时候，（通过一些很神奇的汇编层面的东西，这里我暂时也解释的不太清楚，感觉就是把函数的定义用汇编写了出来）就会跳到生成的汇编代码里</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">.global trace</span><br><span class="line">trace:</span><br><span class="line"> li a7, SYS_trace</span><br><span class="line"> ecall</span><br><span class="line"> ret</span><br></pre></td></tr></table></figure>
-<p>然后因为定义了SYS_trace，所以这一步是能够通过编译的，但是实际执行的时候，因为找不到真的系统调用，所以执行的时候还是会失败。</p>
-<h1 id="step3"><a href="#step3" class="headerlink" title="step3"></a>step3</h1><p>这时候就需要把实现加进来，在kernel&#x2F;sysproc.c文件里加sys_trace()函数，这个函数在proc结构体里保存调用的参数。所以首先先去kernel&#x2F;proc.h在proc的结构体里加一个<code>int mask</code>。然后在kernel&#x2F;sysproc.c里加上sys_trace的定义</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">uint64 sys_trace(void)&#123;</span><br><span class="line">  int mask_;</span><br><span class="line">  if(argint(0,&amp;mask_)&lt;0)&#123;</span><br><span class="line">    return -1;</span><br><span class="line">  &#125;</span><br><span class="line">  myproc()-&gt;mask=mask_;</span><br><span class="line">  //printf(&quot;mask %d\n&quot;, mask_);</span><br><span class="line">  return 0; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>提示里面有说syscall.c找得到参数的代码，另外参考上下文中的系统调用，也可以猜出来可以用argint函数，然后把得到的参数放到结构体里。<br>为什么这里参数只能用这样的方式得到呢？我现在的理解是：因为这里是系统调用，涉及到用户态和内核态的切换，参数是传不进来的，这也是为什么sysproc.c里面定义的系统调用都是uint64 xxxx(void)。这里的参数都需要从进程的trapframe上得到。</p>
-<h3 id="step4"><a href="#step4" class="headerlink" title="step4"></a>step4</h3><p>因为还需要调用子进程，去kernel&#x2F;proc.c里面，可以找到copy进程的代码，把<code>np-&gt;mask = p-&gt;mask;</code>也加到里面。这里有一个小小的问题当时写的时候没有想到，就是既然是copy，那么说明默认应该是有值的，结合判定机制，可以猜测应该要初始化成0，但是当时没有注意到，提示里也没有说。这里用到了c语言结构体默认初始化的设置，默认把mask初始化成0了。</p>
-<h3 id="step5"><a href="#step5" class="headerlink" title="step5"></a>step5</h3><p>最后，我们还需要修改一点别的地方的代码。查看kernel&#x2F;syscall.c文件中的void syscall(void)函数，每次ecall调用trap的时候，会调用syscall函数，这个函数首先从a7中得到系统调用编号（因为在usys.pl里把编号放到了a7里面）。然后有一句很重要的话<br><code>p-&gt;trapframe-&gt;a0 = syscalls[num]();</code><br>这句话的作用是：从上面的syscalls数组里，找到num编号对应的系统调用，调用它，然后把返回值放到a0里。也就是说，这里是唯一能接触到所有系统调用的地方，也是想要实现trace必须修改的地方。这里的实现方法就是判断1&lt;&lt;num和p-&gt;mask有没有交集，如果有交集的话，就说明这个系统调用是需要去trace的，那么就应该输出。所以接下来的修改就很简单了，加上一个包含所有系统调用名字的数组，每次判定trace成功的时候输出pid，sys_call_name_，以及a0</p>
-<h1 id="Sysinfo"><a href="#Sysinfo" class="headerlink" title="Sysinfo"></a>Sysinfo</h1><p>这个实验需要加一个系统调用，sysinfo，收集当前正在运行的系统的相关数据</p>
-</div><hr></div><div class="recent-post-item article-container"><a class="article-title" href="/2023/03/14/6-s081-lab1/">6.s081-lab1-util</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2023-03-14</time><div class="content"><p><img src="/../picture/takagi-1.jpg"></p>
-<h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><p>首先要说的是配置部分，其实整个lab的配置还是挺简单的，用的时间不是很多，我是在windows上做的，因为游戏本上之前装的虚拟机给我留下了很不好的印象，现在秉承着简便易用的原则我最开始就想尝试下能不能在wsl上搞<br>wsl安装随便搜搜就能找到，值得注意的是在Microsoft Store中安装的ubuntu版本需要是20.04，因为这个实验需要用到的riscv的一些库好像只支持这个版本，我最开始没仔细看安装的22.04，然后果不其然失败了，然后卸载重装。结果卸载还没卸载干净，还去查了查原因，用了个什么指令才搞好。<br>安装完就很简单了。指导书说可以直接在文件夹路径输入 \wsl$\ 进入根目录，我的电脑上还装了22.04，所以后面还有一项 \wsl$\Ubuntu-20.04\<br>安装完简简单单换个源，然后装下依赖，make qemu成功就能开始写代码啦！<br>本来其实是想在win11的终端界面用vim写的，但是他自带的vim切多窗口费劲以及回车不自动对齐等用起来很恶心的功能成功地在我写完第一个实验之后就把我劝退了。（话说最开始我还想多坚持一段时间还很用心地改了终端的默认配色来着）后面就是用vscode打开文件夹直接编辑代码了……<br>还有一件很神奇的事情，因为这个project提供的代码仓库没有主分支，只有每个实验对应的分支，所以只会有一个默认的分支，每次只有在向默认分支推送代码的时候才会算github的contribution。这就导致commit代码但是github上的contribution图没有变化。。。有点难定</p>
-<h2 id="正片开始"><a href="#正片开始" class="headerlink" title="正片开始"></a>正片开始</h2><p>第一个实验就是非常经典的util实验了，这个跟我当时做的基本是一样的，但是说实话，现在我在写这个blog的时候刚写完lab4的一部分，但是我觉得我用在实验一的时间是最长的，而且还有一些东西没太搞懂</p>
-<h2 id="Sleep-easy"><a href="#Sleep-easy" class="headerlink" title="Sleep(easy)"></a>Sleep(easy)</h2><h2 id="PingPong-easy"><a href="#PingPong-easy" class="headerlink" title="PingPong(easy)"></a>PingPong(easy)</h2><h2 id="Primes-moderate-x2F-hard"><a href="#Primes-moderate-x2F-hard" class="headerlink" title="Primes(moderate&#x2F;hard)"></a>Primes(moderate&#x2F;hard)</h2><h2 id="Find-moderate"><a href="#Find-moderate" class="headerlink" title="Find(moderate)"></a>Find(moderate)</h2><h2 id="Xargs-moderate"><a href="#Xargs-moderate" class="headerlink" title="Xargs(moderate)"></a>Xargs(moderate)</h2><p>未完待续。。</p>
-</div><hr></div><div class="recent-post-item article-container"><a class="article-title" href="/2023/03/13/OS-Project/">OS Project(开新坑)</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2023-03-13</time><span class="article-meta tags"><span class="article-meta__separator">|</span><i class="fa fa-tag article-meta__icon" aria-hidden="true"></i><a class="article-meta__tags" href="/tags/OS/">OS</a></span><div class="content"><p>从大四到研究生入学以来研究方向一直没定下来，大概就是之前没有特别想做的方向，加上大四一直比较摸鱼，所以迟迟没有定下想做的领域，研究工作现在也只是浮于表面。最近想开始往文件系统方向转一转，感觉这个方向还挺有意思的，所谓万事开头难，操作系统已经是将近两年前学的东西了，现在就是很后悔当时没有多读读写写代码，而且非常可惜的是之前没有搞过操作系统比赛，现在想往这个方向转感觉难度还挺大的。ps.希望最后能顺利毕业&#x3D; &#x3D;</p>
-<p>关于具体想做的内容嘛，现在也只是窥得冰山一角，后面如果我觉得对整体认证足够充足的话再试试整理下写成文字吧</p>
-<p>总之现在自己想了想，比较好的一个起步的项目就是mit的6.s081，一个原因是之前上os的时候做过这个实验，虽然当时基本都是遇到不会的就去搜博客，半做半抄搞完的，但是对这个实验的内容感觉还是非常好的，另一个原因就是xv6算是个比较小型的操作系统了，做实验的时候看看代码也挺好的</p>
-<p>另外为什么要用文字记下来呢？其实我本人是不爱记录东西的，之前高中的时候就不爱整理错题本，感觉非常浪费时间。但是现在回头看看，感觉自己用心做了加上用心整理下收获还是挺大的（也挺有纪念意义的<br>另一个原因是去年年末写的15445的lab给我的触动比较大，去年做15445的时候虽然一方面是为了应付作业的报告，但是做的过程感觉还是挺认真的，但是当时没有及时整理，想着最后一起写还能顺便复习一遍，但是最后写的时候才发现记性太差，都忘记了，而且一旦过了刚刚做完的三分钟热度，后面想写点东西感觉还挺难产的。。。感觉还是得做的时候有时间顺手记一下比较好</p>
-<p>另外ucb的cs162好像也不错，有时间的话可以考虑继续开新坑（但是后面大概率没时间了，搞完这个应该就要开始疯狂看论文了，希望下个月能有点idea</p>
-</div><hr></div><div class="recent-post-item article-container"><a class="article-title" href="/2023/02/06/CMU15445-lab4/">CMU15445-lab4</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2023-02-06</time><span class="article-meta tags"><span class="article-meta__separator">|</span><i class="fa fa-tag article-meta__icon" aria-hidden="true"></i><a class="article-meta__tags" href="/tags/CMU15445/">CMU15445</a></span><div class="content"><h1 id="Concurrency-Control"><a href="#Concurrency-Control" class="headerlink" title="Concurrency Control"></a>Concurrency Control</h1><p>这个实验主要就是实现事务上的lock manager，从而能够实现并行的query execution，锁方面需要支持的函数就是上shared lock、exclusive lock、upgrade lock以及解锁</p>
-<h2 id="Task1-Lock-Manager-amp-amp-Task2-Deadlock-Prevention"><a href="#Task1-Lock-Manager-amp-amp-Task2-Deadlock-Prevention" class="headerlink" title="Task1 Lock Manager &amp;&amp; Task2 Deadlock Prevention"></a>Task1 Lock Manager &amp;&amp; Task2 Deadlock Prevention</h2><p>这分成了两个任务，但是这两个任务其实都在同一部分的代码里，需要先考虑下怎么写在一起，因为对并行的理解不是很够，之前多线程的代码写的也不多，这部分主要是参考了别的代码和博客搞定的。<br>遇到锁申请的时候首先根据tuple对应的rid把申请放到相应的LockRequest中，后面对某个tuple的所有锁操作都是基于这个队列来完成的。每次上锁的时候大致有三件事，设置growing状态，在rid的等待队列里加入申请的txn id，在txn的锁集合加入rid，这三个操作就是task1的任务。这里还需要实现隔离等级，具体的隔离等级以及相关的措施如下：<br>READ_UNCOMMITED只有在需要时上写锁。<br>READ_COMMITTED要解决脏读的问题，解决方案就是读时上读锁，读完解读锁；写时上写锁，但等到commit时才解写锁；读时上读锁，读完解读锁。这样，永远不会读到未commit的数据，因为上面有写锁。<br>REPEATABLE_READ进一步打造可重复读。同一事务读两次数据的中途不想被其他事务的写干扰，这就需要用到巧妙的二段封锁协议（2PL）了：事务分为两个阶段（不考虑commit&#x2F;abort），上锁阶段(GROWING)只上锁，解锁阶段(SHINKING)只解锁。这样，第二次读取时，前一次读取的读锁一定还在，避免了中途被修改。<br>task2比较难，需要做死锁预防，用到了wound-wait(“young wait for old”)，这个方法主要的思路就是杀死比当前请求年轻的申请，等待更老的申请,这里看博客上说不需要管granted_字段，直接遍历请求队列，执行上面提到的操作就可以。最关键的数据结构一个是上面提到的LockRequest，另一个是txn中的lockset，将这两部分对照起来就能实现这一部分的死锁预防处理。<br>对于读锁来说，因为其可以共存，所以只需要abort掉新事务的写请求<br>而等待操作较为麻烦，主要需要考虑两方面设计，一方面需要使用条件变量协调多线程，也就是等待的时候wait，unlock的时候notify_all，另外一方面，还需要考虑的一点是在等待结束后当前事务有可能已经被abort掉了，所以还需要单独处理。参考的一些做法是用了goto语句，感觉不太合理，但是这里不再继续深究了，就先保留了</p>
-<h2 id="Task3-Concurrent-Query-Execution"><a href="#Task3-Concurrent-Query-Execution" class="headerlink" title="Task3 Concurrent Query Execution"></a>Task3 Concurrent Query Execution</h2><p>在lab3的基础上加读写锁，有的地方不是很理解，比如insert后才得到rid但是这样就没法对表加锁只能对index加锁，但是也通过了测试。另外还要加上index_write_set的操作，用来回滚，只需要在加索引的时候顺便构造一下就可以了。</p>
-<p>对理解有帮助的一篇博客<a target="_blank" rel="noopener" href="https://www.inlighting.org/archives/database-concurrency-control">https://www.inlighting.org/archives/database-concurrency-control</a><br>（总结，还是得随手记录一下，不然最后都忘了<br>（以及，有时间的话最好能看看指定教材和ppt，我只是做项目的时候粗略看了下，感觉应该仔细看看<br>这个项目是关于数据库的一个非常好的项目，这个项目的文档非常完善，测试代码非常详细。不仅项目本身自带的一部分测试，还有大量的在线测试，能够找到代码绝大部分的bug与不符合题目要求的地方。为了一些未通过的测试用例去修改代码是一个锻炼代码能力和加深理解的方式。<br>可惜的是在线测试代码没有开源，找bug只能通过简短的提示自己设计用例来测试，比较耗时间。我断断续续做了差不多两个多月的时间，在做project4时还没有全部完成就到了2023年，对2021年的在线测试已经过期了，这部分的代码还只能通过本地的测试。另外比较可惜的一点是我没有看完教材的所有内容和在线的课程，只是面向这个项目学习了一部分知识，如果有时间的话希望能够再去补充学习一下。</p>
-</div><hr></div><div class="recent-post-item article-container"><a class="article-title" href="/2023/01/08/CMU15445-lab3/">CMU15445-lab3</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2023-01-08</time><span class="article-meta tags"><span class="article-meta__separator">|</span><i class="fa fa-tag article-meta__icon" aria-hidden="true"></i><a class="article-meta__tags" href="/tags/%E2%80%9CCMU15445/">“CMU15445&quot;</a></span><div class="content"><h1 id="Query-Execution"><a href="#Query-Execution" class="headerlink" title="Query Execution"></a>Query Execution</h1><p>这个实验主要是需要完成一些简单的executor，这里需要简单地了解下迭代器模型中的火山模型，是比较常见的数据库指令运行的模式。这里简单介绍下我的理解：首先输入指令会被解析成一个对应的语法树，对这棵树进行指令相应的操作时，会从根节点逐个节点地向下遍历，遍历到叶子节点时，叶子节点返回下一个值，返回上一个节点，从而一步步回到根节点，不断地重复这个操作，最终得到指令要求的全部数据。理解了这个过程就能大概理解这个实验的主题代码架构。在一个博客里看到这个过程类似于一种协程的概念，生成结果后保留状态等待下一次被唤醒再生成下一个结果，但是我不是很了解这个概念，这里只引用不介绍。<br>另外，这个实验最难的部分其实是对其中预先设定的类的理解是否到位。最好能够先好好阅读各种工具类和相关的测试代码，这样才能充分理解任务的要求和相关的类的功能。</p>
-<h2 id="Task1-Executors"><a href="#Task1-Executors" class="headerlink" title="Task1 Executors"></a>Task1 Executors</h2><p>因为要生成语法树的结构，所以在代码运行的过程中，根据sql语句，会生成相应的abstractexpression类作为树上的节点，代表不同操作的类从这个抽象类中派生出来。具体包含四种expression子类：<br>ConstantValueExpression，ColumnValueExpression，AggregateValueExpression，ComparisonExpression<br>在写代码的时候要充分利用这四种表达式得到语句需要的值从而得到最终返回的结果。<br>update 需要注意的是update的next只能执行一次，不然的话会产生出结果元组，这和原本的语义是不符的<br>join分为两种，nested loop join和hash join，nested loop join比较简单，就是n*m的遍历，找到符合条件的就生成结果就可以，注意循环中的边界条件，以及一边遍历后另一边进入下一个元素的状态切换就可以了。hash join首先需要模仿SimpleAggregationHashTable写个类似的hash类，init的时候先把左边孩子节点的哈希值保存，然后next的时候遍历右孩子节点，找哈希值一样的节点，从而得到结果。需要注意的是，这个必须严格按照这个标准写，时间太长或者太短好像都会导致最后的测试失败。<br>Aggregate也比较难，难点主要在于判断所有数据结构的功能，并且充分利用所有的数据结构。这个主要是需要多读其他部分的代码，有不懂的地方多去找网上的博客。<br>另外要加的一个功能就是index，每次在insert，delete，update的时候都更新相关的索引，这样能够加快查找的速度，这一部分内容可以通过catalog来解决。</p>
-</div><hr></div><div class="recent-post-item article-container"><a class="article-title" href="/2022/12/20/CMU15445-lab2/">CMU15445-lab2</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2022-12-20</time><span class="article-meta tags"><span class="article-meta__separator">|</span><i class="fa fa-tag article-meta__icon" aria-hidden="true"></i><a class="article-meta__tags" href="/tags/CMU15445/">CMU15445</a></span><div class="content"><h1 id="Extendible-Hashing-Index"><a href="#Extendible-Hashing-Index" class="headerlink" title="Extendible Hashing Index"></a>Extendible Hashing Index</h1><p>这个实验难度比较高，前前后后改了很久很久的bug。。。主要的问题就是对这个可扩展哈希的概念理解的不够，虽然反复看了很多遍但是最后在写的时候在测试时遇到bug才可能知道自己错在哪，有的bug涉及到内存泄漏还很难搞，最后一次提交几乎是重写了一遍，总共在测试网站上提交了80多次，总算通过了全部测试。说起来这个课程好像有配套的教材，有时间可以瞄一眼，感觉很多设计看网站上的指导很模糊&#x3D; &#x3D;<br>关于零长数组可以参考这篇<a target="_blank" rel="noopener" href="https://blog.csdn.net/gatieme/article/details/64131322">blog</a><br>因为使用了零长数组，所以如果内存管理出现了问题就会导致某个结构体的某个值可能与预测值不同，这可能就是某一个错误的赋值操作导致的，这个项目难以debug一部分原因也在这里，就算找到了被误改的元素可能也不知道其来源在哪里</p>
-<h2 id="Task1-Page-Layout"><a href="#Task1-Page-Layout" class="headerlink" title="Task1 Page Layout"></a>Task1 Page Layout</h2><p>page分为两种，第一种为Hash Table Directory Page, 第二种为Hash Table Bucket Page，也就是目录页以及具体存tuple的页<br>Bucket page需要实现的部分中主要需要理解occupied和readable成员的含义，occupied的含义是某个位是否被使用过，readable的含义是某个位当前是否存在元素，时间维度上不同，occupied用处不大，感觉可以不用，最后实现的效果就是能够记录每个slot上是否被使用，能够实现增删查<br>Directory Page主要负责的内容是需要根据directory内部保存的索引找到相对应的bucket page，将bucket id映射到page id，同时也保留了local depth和global depth，用于extendible hash增长缩减</p>
-<h2 id="Task2-Hash-Table-Implementation"><a href="#Task2-Hash-Table-Implementation" class="headerlink" title="Task2 Hash Table Implementation"></a>Task2 Hash Table Implementation</h2><p>首先最基础的是Getvalue，这个函数很容易就能实现<br>然后是insert和remove，这两个函数理论上和getvalue同理，但是因为是可扩展哈希，这两个方法还分别涉及到split和merge，相应地也包含directory的grow和shrink，<br>以insert为例，如果是简单的插入的话只需要找到对应的bucketpage，然后用buffer pool manager中实现过的方法就能够实现读取，再对读取到的页进行插入操作即可，但是如果当前要插入的页已经满了的话，因为是extendible hash table，就需要分裂，容易想到，这是一个递归的过程，如果第二次分裂后的结果依然是所有的元素在一个桶中，那么分裂仍然要进行下去。<br>分两种情况，待分裂的桶的localdepth等于globaldepth，这种情况下需要directory double。double后先默认最高位取反的index与原本的index指向同一个桶，然后将需要分裂的桶对应的index修改指向新创建的桶，同时维护相关的global depth和local depth。最后还需要对桶里的元素rehash，重新映射到两个桶中。等于的情况下实现起来的一个好处就是如果深度相等，那么只需要处理这个桶和新的桶两个桶的关系，其他的保留即可。小于的情况下是多对一的情况，需要多对一重新映射<br>如果小于，那么直接找对应的split image。这里需要注意的是怎么去找split image，大概的思路就是local depth对应的位取反的做一组，不取反的做一组，这样划分的两组才能够符合分裂的逻辑<br>需要注意的是，如果一次分裂之后不满足条件，需要递归地去分裂这个桶，所以可以把递归程序写到一个单独的函数中用来递归，在满足条件的时候从insert引用<br>merge也是一样的道理，需要递归地去操作，但是这里最开始有个错误卡了很久，最后查到是对概念理解出现了问题导致代码的原理出错了，就是关于merge bucket的index应该取哪一位的问题。<br>相对来说，目录的grow和shrink就非常简单，只需要在split和merge的时候注意一下即可</p>
-<h2 id="Task3-Concurrency-Control"><a href="#Task3-Concurrency-Control" class="headerlink" title="Task3 Concurrency Control"></a>Task3 Concurrency Control</h2><p>这里有两种锁，lock和latch，其中lock对hash table锁，我理解是一个比较大的层面上的锁，是用来锁directory的，latch则是对每个bucket page的锁，每次读写的时候考虑下是否会改变相应的数据结构加上相应的锁就可以了，加锁之后记得退出要解锁，每个分支都注意到就可以了。</p>
-</div><hr></div><div class="recent-post-item article-container"><a class="article-title" href="/2022/12/03/CMU15445-lab1/">lab1</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2022-12-03</time><span class="article-meta tags"><span class="article-meta__separator">|</span><i class="fa fa-tag article-meta__icon" aria-hidden="true"></i><a class="article-meta__tags" href="/tags/CMU15445/">CMU15445</a></span><div class="content"><h1 id="buffer-pool-manager"><a href="#buffer-pool-manager" class="headerlink" title="buffer pool manager"></a>buffer pool manager</h1><p>这个实验比较简单，讲的是在底层的页级别的读写是怎么做的，一共有三个实验：LRU Replacement Policy, Buffer Pool Manager Instance, Parrallel Buffer Pool Manager，难度大概是2&gt;1&gt;3<br>在开始之前首先需要想清楚这个实验要做的是什么，第一个任务实现了一个Replacer，这个Replacer票选出哪一个内存中的块可以被换出，第二个任务就是在此基础上进一步实现，第三个任务与多线程相关。。</p>
-<h2 id="Task1-LRU-Replacement-Policy"><a href="#Task1-LRU-Replacement-Policy" class="headerlink" title="Task1 LRU Replacement Policy"></a>Task1 LRU Replacement Policy</h2><p>这个任务可以主要工作就是实现一个LRU，双端链表+哈希表就可以，相关的方法也就是LRU的接口的另一种表达</p>
-<h2 id="Task2-Buffer-Pool-Manager-Instance"><a href="#Task2-Buffer-Pool-Manager-Instance" class="headerlink" title="Task2 Buffer Pool Manager Instance"></a>Task2 Buffer Pool Manager Instance</h2><p>这个任务比较有难度，六个接口，这些接口的功能我怀疑有些测试也没有完全测试到。<br>课程网站上有一段话说的比较好，这里摘抄一下：</p>
-<blockquote>
-<p>Note: Pin and Unpin within the contexts of the LRUReplacer and the BufferPoolManagerInstance have inverse meanings. Within the context of the LRUReplacer, pinning a page implies that we shouldn’t evict the page because it is in use. This means we should remove it from the LRUReplacer. On the other hand, pinning a page in the BufferPoolManagerInstance implies that we want to use a page, and that it should not be removed from the buffer pool.</p>
-</blockquote>
-<p>在LRU中，pin意味着某个页在使用，所以不能把他再留在Replacer中，因为Replacer中的是留着等待换出的，在BufferPoolManagerInstance中，pin的意思是在使用中，所以这个页还不能被移出Pool<br>这里的难点一方面是page数据结构里面的变量比较多，需要注意设置的变量比较多，需要注意点，另外一方面是需要注意这个数据结构，page_table_  std::unordered_map&lt;page_id_t, frame_id_t&gt;,从page_id映射到frame_id，具体两者的关系可以看图<br><img src="/../picture/buffer_pool_manager.png" alt="page-&gt;frame"></p>
-<h2 id="Task3-Parallel-Buffer-Pool-Manager"><a href="#Task3-Parallel-Buffer-Pool-Manager" class="headerlink" title="Task3 Parallel Buffer Pool Manager"></a>Task3 Parallel Buffer Pool Manager</h2><p>这个就比较简单了，调用下之前实现了的接口就可以了，主要需要写的代码就是新加入的页应该加入哪个buffer pool，这个按照教程写就可以了（这里我感觉我写的错了但是还是通过了全部测试，很奇怪</p>
-</div><hr></div><div class="recent-post-item article-container"><a class="article-title" href="/2022/12/03/CMU15445-lab0/">lab0</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2022-12-03</time><span class="article-meta tags"><span class="article-meta__separator">|</span><i class="fa fa-tag article-meta__icon" aria-hidden="true"></i><a class="article-meta__tags" href="/tags/CMU15445/">CMU15445</a></span><div class="content"><h2 id="先从环境配置讲起"><a href="#先从环境配置讲起" class="headerlink" title="先从环境配置讲起"></a>先从环境配置讲起</h2><p>按照项目github地址或是课程指导书地址，配置工程文件。这里我选择的是用docker来配置项目。我是在windows上写的，每次写代码之前先启动docker desktop，配置的时候有共享的文件夹，所以可以在windows下的vscode里写代码，然后在命令行切到docker容器里make &amp; test</p>
-<h2 id="vscode的显示问题"><a href="#vscode的显示问题" class="headerlink" title="vscode的显示问题"></a>vscode的显示问题</h2><p>vscode有可能有两个可能出问题的地方，一是windows环境里没有c++的库文件，这个问题可以通过下载mingw解决，另一个是代码提示可能出问题要手动在设置里把c++默认版本调到11以上</p>
-<h2 id="git的使用"><a href="#git的使用" class="headerlink" title="git的使用"></a>git的使用</h2><p>略（这个项目用到的也就push pull）</p>
-<h2 id="c-基础"><a href="#c-基础" class="headerlink" title="c++基础"></a>c++基础</h2><p>还在恶补c++ primer。。</p>
-<h2 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h2><p>数据库教学整体结构可以参考这幅图，实验内容大致是从底向上但是不完全相同<img src="/../picture/hierarchy.png" alt="结构"></p>
-<h2 id="帮助很大的博客"><a href="#帮助很大的博客" class="headerlink" title="帮助很大的博客"></a>帮助很大的博客</h2><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/freedom1523646952/article/details/123056958">https://blog.csdn.net/freedom1523646952/article/details/123056958</a><br><a target="_blank" rel="noopener" href="https://blog.csdn.net/twentyonepilots/article/details/120868216">https://blog.csdn.net/twentyonepilots/article/details/120868216</a></p>
-</div><hr></div><div class="recent-post-item article-container"><a class="article-title" href="/2022/12/02/first-blog/">first blog</a><time class="post-meta__date"><i class="fa fa-calendar" aria-hidden="true"></i> 2022-12-02</time><span class="article-meta tags"><span class="article-meta__separator">|</span><i class="fa fa-tag article-meta__icon" aria-hidden="true"></i><a class="article-meta__tags" href="/tags/casual/">casual</a></span><div class="content"><h1 id="first-blog"><a href="#first-blog" class="headerlink" title="first blog!"></a>first blog!</h1><p>第一次尝试写博客。。主要是为了记录下最近在做的数据库实验，方便以后回来查找<br>后面有机会的话可能会把看的论文和写的项目顺便更新上来？</p>
-</div><hr></div><nav id="pagination"><div class="pagination"><span class="page-number current">1</span></div></nav></div></div><footer class="footer-bg" style="background-image: url(/background.jpg)"><div class="layout" id="footer"><div class="copyright">&copy;2013 - 2023 By Dys</div><div class="framework-info"><span>Driven - </span><a target="_blank" rel="noopener" href="http://hexo.io"><span>Hexo</span></a><span class="footer-separator">|</span><span>Theme - </span><a target="_blank" rel="noopener" href="https://github.com/Molunerfinn/hexo-theme-melody"><span>Melody</span></a></div><div class="busuanzi"><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><span id="busuanzi_container_site_uv"><i class="fa fa-user"></i><span id="busuanzi_value_site_uv"></span><span></span></span><span class="footer-separator">|</span><span id="busuanzi_container_site_pv"><i class="fa fa-eye"></i><span id="busuanzi_value_site_pv"></span><span></span></span></div></div></footer><i class="fa fa-arrow-up" id="go-up" aria-hidden="true"></i><script src="https://cdn.jsdelivr.net/npm/animejs@latest/lib/anime.min.js"></script><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@latest/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-ui-pack@latest/velocity.ui.min.js"></script><script src="/js/utils.js?version=1.9.1"></script><script src="/js/fancybox.js?version=1.9.1"></script><script src="/js/sidebar.js?version=1.9.1"></script><script src="/js/copy.js?version=1.9.1"></script><script src="/js/fireworks.js?version=1.9.1"></script><script src="/js/transition.js?version=1.9.1"></script><script src="/js/scroll.js?version=1.9.1"></script><script src="/js/head.js?version=1.9.1"></script><script>if(/Android|webOS|iPhone|iPod|iPad|BlackBerry/i.test(navigator.userAgent)) {
-  $('#nav').addClass('is-mobile')
-  $('footer').addClass('is-mobile')
-  $('#top-container').addClass('is-mobile')
-}</script></body></html>
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Dys">
+  <meta name="keywords" content="">
+  
+    <meta property="og:type" content="website">
+<meta property="og:title" content="Dys&#39;s Blog">
+<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:site_name" content="Dys&#39;s Blog">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="Dys">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Dys&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="Dys's Blog" type="application/atom+xml">
+</head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Dys Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/background.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Dys的碎碎念~"></span>
+          
+        </div>
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div id="board"
+          style="margin-top: 0">
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2023/03/24/6-s081-lab2/" target="_self">
+          6-s081-lab2
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/03/24/6-s081-lab2/" target="_self">
+        <div>
+          System calls上个实验做了几个用户态的调用，这个实验就要开始尝试做系统调用（system call） Tracingtrace能够接受一个参数，mask，这个参数指定需要去trace哪个或者说哪几个系统调用，输出的格式是  pid: name of system call -&gt; return value  另外trace也能追踪调用它的进程的子进程。上面是要求，接下来就是详细的做
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-03-24 00:28" pubdate>
+              2023-03-24
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/OS/">#OS</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2023/03/14/6-s081-lab1/" target="_self">
+          6.s081-lab1-util
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/03/14/6-s081-lab1/" target="_self">
+        <div>
+          环境配置首先要说的是配置部分，其实整个lab的配置还是挺简单的，用的时间不是很多，我是在windows上做的，因为游戏本上之前装的虚拟机给我留下了很不好的印象，现在秉承着简便易用的原则我最开始就想尝试下能不能在wsl上搞wsl安装随便搜搜就能找到，值得注意的是在Microsoft Store中安装的ubuntu版本需要是20.04，因为这个实验需要用到的riscv的一些库好像只支持这个版本，我最
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-03-14 00:13" pubdate>
+              2023-03-14
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/OS/">#OS</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2023/03/13/OS-Project/" target="_self">
+          OS Project(开新坑)
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/03/13/OS-Project/" target="_self">
+        <div>
+          从大四到研究生入学以来研究方向一直没定下来，大概就是之前没有特别想做的方向，加上大四一直比较摸鱼，所以迟迟没有定下想做的领域，研究工作现在也只是浮于表面。最近想开始往文件系统方向转一转，感觉这个方向还挺有意思的，所谓万事开头难，操作系统已经是将近两年前学的东西了，现在就是很后悔当时没有多读读写写代码，而且非常可惜的是之前没有搞过操作系统比赛，现在想往这个方向转感觉难度还挺大的。ps.希望最后能顺利
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-03-13 23:53" pubdate>
+              2023-03-13
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/OS/">#OS</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2023/02/06/CMU15445-lab4/" target="_self">
+          CMU15445-lab4
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/02/06/CMU15445-lab4/" target="_self">
+        <div>
+          Concurrency Control这个实验主要就是实现事务上的lock manager，从而能够实现并行的query execution，锁方面需要支持的函数就是上shared lock、exclusive lock、upgrade lock以及解锁 Task1 Lock Manager &amp;&amp; Task2 Deadlock Prevention这分成了两个任务，但是这两个任务其
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-02-06 16:00" pubdate>
+              2023-02-06
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/CMU15445/">#CMU15445</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2023/01/08/CMU15445-lab3/" target="_self">
+          CMU15445-lab3
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/01/08/CMU15445-lab3/" target="_self">
+        <div>
+          Query Execution这个实验主要是需要完成一些简单的executor，这里需要简单地了解下迭代器模型中的火山模型，是比较常见的数据库指令运行的模式。这里简单介绍下我的理解：首先输入指令会被解析成一个对应的语法树，对这棵树进行指令相应的操作时，会从根节点逐个节点地向下遍历，遍历到叶子节点时，叶子节点返回下一个值，返回上一个节点，从而一步步回到根节点，不断地重复这个操作，最终得到指令要求的全
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-01-08 05:47" pubdate>
+              2023-01-08
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E2%80%9CCMU15445/">#“CMU15445"</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/12/20/CMU15445-lab2/" target="_self">
+          CMU15445-lab2
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/12/20/CMU15445-lab2/" target="_self">
+        <div>
+          Extendible Hashing Index这个实验难度比较高，前前后后改了很久很久的bug。。。主要的问题就是对这个可扩展哈希的概念理解的不够，虽然反复看了很多遍但是最后在写的时候在测试时遇到bug才可能知道自己错在哪，有的bug涉及到内存泄漏还很难搞，最后一次提交几乎是重写了一遍，总共在测试网站上提交了80多次，总算通过了全部测试。说起来这个课程好像有配套的教材，有时间可以瞄一眼，感觉很多
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-12-20 02:59" pubdate>
+              2022-12-20
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/CMU15445/">#CMU15445</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/12/03/CMU15445-lab1/" target="_self">
+          lab1
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/12/03/CMU15445-lab1/" target="_self">
+        <div>
+          buffer pool manager这个实验比较简单，讲的是在底层的页级别的读写是怎么做的，一共有三个实验：LRU Replacement Policy, Buffer Pool Manager Instance, Parrallel Buffer Pool Manager，难度大概是2&gt;1&gt;3在开始之前首先需要想清楚这个实验要做的是什么，第一个任务实现了一个Replacer，这个R
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-12-03 00:45" pubdate>
+              2022-12-03
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/CMU15445/">#CMU15445</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/12/03/CMU15445-lab0/" target="_self">
+          lab0
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/12/03/CMU15445-lab0/" target="_self">
+        <div>
+          先从环境配置讲起按照项目github地址或是课程指导书地址，配置工程文件。这里我选择的是用docker来配置项目。我是在windows上写的，每次写代码之前先启动docker desktop，配置的时候有共享的文件夹，所以可以在windows下的vscode里写代码，然后在命令行切到docker容器里make &amp; test vscode的显示问题vscode有可能有两个可能出问题的地方，一
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-12-03 00:25" pubdate>
+              2022-12-03
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/CMU15445/">#CMU15445</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
+        <a href="/2022/12/02/first-blog/" target="_self">
+          first blog
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2022/12/02/first-blog/" target="_self">
+        <div>
+          first blog!第一次尝试写博客。。主要是为了记录下最近在做的数据库实验，方便以后回来查找后面有机会的话可能会把看的论文和写的项目顺便更新上来？
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2022-12-02 18:47" pubdate>
+              2022-12-02
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/casual/">#casual</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+
+
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
