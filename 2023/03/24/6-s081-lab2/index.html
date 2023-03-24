@@ -18,7 +18,7 @@
   
     <meta name="description" content="System calls上个实验做了几个用户态的调用，这个实验就要开始尝试做系统调用（system call） Tracingtrace能够接受一个参数，mask，这个参数指定需要去trace哪个或者说哪几个系统调用，输出的格式是  pid: name of system call -&gt; return value  另外trace也能追踪调用它的进程的子进程。上面是要求，接下来就是详细的做">
 <meta property="og:type" content="article">
-<meta property="og:title" content="6-s081-lab2">
+<meta property="og:title" content="6-s081-lab2 System call">
 <meta property="og:url" content="http://example.com/2023/03/24/6-s081-lab2/index.html">
 <meta property="og:site_name" content="Dys&#39;s Blog">
 <meta property="og:description" content="System calls上个实验做了几个用户态的调用，这个实验就要开始尝试做系统调用（system call） Tracingtrace能够接受一个参数，mask，这个参数指定需要去trace哪个或者说哪几个系统调用，输出的格式是  pid: name of system call -&gt; return value  另外trace也能追踪调用它的进程的子进程。上面是要求，接下来就是详细的做">
@@ -26,7 +26,7 @@
 <meta property="og:image" content="http://example.com/picture/6.s081lab2/pic2.jpg">
 <meta property="og:image" content="http://example.com/picture/6.s081lab2/p1.png">
 <meta property="article:published_time" content="2023-03-23T16:28:36.000Z">
-<meta property="article:modified_time" content="2023-03-24T03:14:11.469Z">
+<meta property="article:modified_time" content="2023-03-24T14:37:35.938Z">
 <meta property="article:author" content="Dys">
 <meta property="article:tag" content="OS">
 <meta name="twitter:card" content="summary_large_image">
@@ -34,7 +34,7 @@
   
   
   
-  <title>6-s081-lab2 - Dys&#39;s Blog</title>
+  <title>6-s081-lab2 System call - Dys&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -99,7 +99,7 @@
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>Dys Blog</strong>
+      <strong>Dys的碎碎念~</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -201,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="6-s081-lab2"></span>
+            <span id="subtitle" data-typed-text="6-s081-lab2 System call"></span>
           
         </div>
 
@@ -224,7 +224,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2k 字
+          2.7k 字
         
       </span>
     
@@ -235,7 +235,7 @@
         
         
         
-          17 分钟
+          23 分钟
         
       </span>
     
@@ -273,7 +273,7 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">6-s081-lab2</h1>
+            <h1 style="display: none">6-s081-lab2 System call</h1>
             
             
               <div class="markdown-body">
@@ -294,29 +294,14 @@
 <p>提示里面有说syscall.c找得到参数的代码，另外参考上下文中的系统调用，也可以猜出来可以用argint函数，然后把得到的参数放到结构体里。<br>为什么这里参数只能用这样的方式得到呢？我现在的理解是：因为这里是系统调用，涉及到用户态和内核态的切换，参数是传不进来的，这也是为什么sysproc.c里面定义的系统调用都是uint64 xxxx(void)。这里的参数都需要从进程的trapframe上得到。</p>
 <h3 id="step4"><a href="#step4" class="headerlink" title="step4"></a>step4</h3><p>因为还需要调用子进程，去kernel&#x2F;proc.c里面，可以找到copy进程的代码，把<code>np-&gt;mask = p-&gt;mask;</code>也加到里面。这里有一个小小的问题当时写的时候没有想到，就是既然是copy，那么说明默认应该是有值的，结合判定机制，可以猜测应该要初始化成0，但是当时没有注意到，提示里也没有说。这里用到了c语言结构体默认初始化的设置，默认把mask初始化成0了。</p>
 <h3 id="step5"><a href="#step5" class="headerlink" title="step5"></a>step5</h3><p>最后，我们还需要修改一点别的地方的代码。查看kernel&#x2F;syscall.c文件中的void syscall(void)函数，每次ecall调用trap的时候，会调用syscall函数，这个函数首先从a7中得到系统调用编号（因为在usys.pl里把编号放到了a7里面）。然后有一句很重要的话<br><code>p-&gt;trapframe-&gt;a0 = syscalls[num]();</code><br>这句话的作用是：从上面的syscalls数组里，找到num编号对应的系统调用，调用它，然后把返回值放到a0里。也就是说，这里是唯一能接触到所有系统调用的地方，也是想要实现trace必须修改的地方。这里的实现方法就是判断1&lt;&lt;num和p-&gt;mask有没有交集，如果有交集的话，就说明这个系统调用是需要去trace的，那么就应该输出。所以接下来的修改就很简单了，加上一个包含所有系统调用名字的数组，每次判定trace成功的时候输出pid，sys_call_name_，以及a0</p>
-<h1 id="Sysinfo"><a href="#Sysinfo" class="headerlink" title="Sysinfo"></a>Sysinfo</h1><p>这个实验需要加一个系统调用，sysinfo，收集当前正在运行的系统的相关数据</p>
-<h2 id="顺手写在这里"><a href="#顺手写在这里" class="headerlink" title="顺手写在这里"></a>顺手写在这里</h2><p>记录下每个tag颜色的配置方法，方便后面回来查</p>
-<div class="note note-primary">
-            <p>文字 或者 <code>markdown</code> 均可</p>
-          </div>
-<div class="note note-secondary">
-            <p>文字 或者 <code>markdown</code> 均可</p>
-          </div>
-<div class="note note-success">
-            <p>文字 或者 <code>markdown</code> 均可</p>
-          </div>
-<div class="note note-danger">
-            <p>文字 或者 <code>markdown</code> 均可</p>
-          </div>
-<div class="note note-warning">
-            <p>文字 或者 <code>markdown</code> 均可</p>
-          </div>
-<div class="note note-info">
-            <p>文字 或者 <code>markdown</code> 均可</p>
-          </div>
-<div class="note note-light">
-            <p>文字 或者 <code>markdown</code> 均可</p>
-          </div>
+<h2 id="Sysinfo"><a href="#Sysinfo" class="headerlink" title="Sysinfo"></a>Sysinfo</h2><p>这个实验需要加一个系统调用，sysinfo，收集当前正在运行的系统的相关数据。系统调用的参数是一个指向struct sysinfo的指针，kernel在调用这个系统调用的时候把内存中空闲字节的数量和state<strong>不是</strong>UNUSED的进程数量（也就是在用的进程数量）</p>
+<h3 id="step1-1"><a href="#step1-1" class="headerlink" title="step1"></a>step1</h3><p>在makefile加 $U&#x2F;_sysinfotest</p>
+<h3 id="step2-1"><a href="#step2-1" class="headerlink" title="step2"></a>step2</h3><p>仿照上面添加系统调用的流程，加上系统调用的接口，需要注意的一点是用户态的调用接口user&#x2F;user.h中声明的<code>int sysinfo(struct sysinfo *)</code>前面需要声明sysinfo结构体。如果到这里添加正确，那么可以正确编译，但是不能顺利执行系统调用（当然不能，因为这里还是空的）</p>
+<h3 id="step3-1"><a href="#step3-1" class="headerlink" title="step3"></a>step3</h3><p>接下来分别实现两个函数，在kernel&#x2F;kalloc.c中实现<code>count_mem()</code>函数统计空闲内存的数量，在kernel&#x2F;proc.c中实现<code>count_proc()</code>函数统计在用的进程数量<br>仿照kalloc.c中的函数实现<code>count_mem()</code>，加锁，然后遍历freelist，计算这个链表的数量，然后解锁，返回数量，这个数量需要乘PGSIZE（这个是测试的时候发现的，指导书没咋说）<br>仿照proc.c中的函数实现<code>count_proc()</code>，遍历proc数组，每次加锁判断状态，如果不是UNUSED(这里最开始写的时候没注意到不是)，就加一，然后解锁，最后返回数量</p>
+<h3 id="step4-1"><a href="#step4-1" class="headerlink" title="step4"></a>step4</h3><p>完成sys_sysinfo函数。这里因为用户态的调用输入的是一个指针，所以参数是最后结果的sysinfo的地址，仿照其他的系统调用的输入方法。</p>
+<figure class="highlight sas"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs sas"><span class="hljs-keyword">if</span>(arg<span class="hljs-meta">addr</span>(0,<span class="hljs-variable">&amp;address_sysinfo</span>)&lt;0)&#123;<br>    <span class="hljs-keyword">return</span> -1;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>然后分别调用<code>count_proc()</code>和<code>count_mem()</code>，把这两个结果存到一个临时的sysinfo中，最后用copyout方法，把这个结果从内核态放到用户态的地址上，得到最后的结果！</p>
+
                 
               </div>
             
@@ -340,7 +325,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>6-s081-lab2</div>
+      <div>6-s081-lab2 System call</div>
       <div>http://example.com/2023/03/24/6-s081-lab2/</div>
     </div>
     <div class="license-meta">
@@ -385,12 +370,18 @@
                   <article class="post-prev col-6">
                     
                     
+                      <a href="/2023/03/24/%E5%8D%9A%E5%AE%A2%E9%85%8D%E7%BD%AE/" title="博客配置">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">博客配置</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2023/03/14/6-s081-lab1/" title="6.s081-lab1-util">
-                        <span class="hidden-mobile">6.s081-lab1-util</span>
+                      <a href="/2023/03/14/6-s081-lab1/" title="6.s081-lab1 Util">
+                        <span class="hidden-mobile">6.s081-lab1 Util</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
