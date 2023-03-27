@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-03-27T11:55:43.484Z</updated>
+  <updated>2023-03-27T14:19:54.342Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,16 +21,15 @@
     <link href="http://example.com/2023/03/27/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-The-Design-and-Implementation-of-a-Log-Structured-File-System/"/>
     <id>http://example.com/2023/03/27/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-The-Design-and-Implementation-of-a-Log-Structured-File-System/</id>
     <published>2023-03-27T11:45:02.000Z</published>
-    <updated>2023-03-27T11:55:43.484Z</updated>
+    <updated>2023-03-27T14:19:54.342Z</updated>
     
-    <content type="html"><![CDATA[<p><img src="/../picture/LFS-Reading/takagi.jpg" alt="可可爱爱三人组"></p><blockquote><p>Log-structured file systems are based on the assumption that files are cached in main memory and that increasing memory sizes will make the caches more and more effective at satisfying read requests[1]. As a result, disk traffic will become dominated by writes.<br>这个文章是基于这样一种假设：如果cache够大，那么所有读请求都会被cache满足，那么硬盘层面的访问延迟就都会出现在写请求上</p></blockquote>]]></content>
+    <content type="html"><![CDATA[<p><img src="/../picture/LFS-Reading/takagi.jpg" alt="可可爱爱三人组"></p><h1 id="The-Design-and-Implementation-of-a-Log-Structured-File-System"><a href="#The-Design-and-Implementation-of-a-Log-Structured-File-System" class="headerlink" title="The Design and Implementation of a Log-Structured File System"></a>The Design and Implementation of a Log-Structured File System</h1><p>网上的关于LFS的资料有点松散了，看到最后感觉还是得追根溯源来看看这篇论文</p><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><blockquote><p>Log-structured file systems are based on the assumption that files are cached in main memory and that increasing memory sizes will make the caches more and more effective at satisfying read requests[1]. As a result, disk traffic will become dominated by writes.</p></blockquote><p>这个文章是基于这样一种假设：如果cache够大，那么所有读请求都会被cache满足，那么硬盘层面的访问延迟就都会出现在写请求上。从现在的角度来看，SSD访问的延迟方面写延迟是远高于读延迟的，也就是说为了满足SSD的访问需要，通过这种方式构建文件系统减少随机写也是合理的。</p><h2 id="Design-for-file-systems-of-the-1990’s"><a href="#Design-for-file-systems-of-the-1990’s" class="headerlink" title="Design for file systems of the 1990’s"></a>Design for file systems of the 1990’s</h2><p>其实这段就是背景介绍</p><h3 id="2-1-Technology"><a href="#2-1-Technology" class="headerlink" title="2.1 Technology"></a>2.1 Technology</h3><p>三个部分对文件系统设计非常重要：processors,disks,main memory.</p><ul><li><p>Processors增速太快，导致其他部分必须尽力够得上它的增长速度。</p></li><li><p>Disk也在快速发展，但是发展主要在cost和capacity上，而不是性能上。Disk performance分为两部分，transfer bandwidth和access time。</p><blockquote><p>Disk transfer bandwidth can be improved substantially with the use of disk arrays and parallel-head disks[5] but no major improvements seem likely for access time (it is determined by mechanical motions that are hard to improve). If an application causes a sequence of small disk transfers separated by seeks, then the application is not likely to experience much speedup over the next ten years, even with faster processors.</p></blockquote></li><li><p>main memory的容量在指数级增长，这导致可以使用更大的file cache</p><blockquote><p>First, larger file caches alter the workload presented to the disk by absorbing a greater fraction of the read requests[1, 6]. Most write requests must eventually be reflected on disk for safety, so disk traffic (and disk performance) will become more and more dominated by writes.</p></blockquote></li></ul><p>这点就跟上面提到的一样，cache大了对read利好，这样performance就很大程度上依赖于write了</p><blockquote><p>The second impact of large file caches is that they can serve as write buffers where large numbers of modified blocks can be collected before writing any of them to disk. Buffering may make it possible to write the blocks more efficiently, for example by writing them all in a single sequential transfer with only one seek.</p></blockquote><p>第二点就是可以把多个写请求汇总到一个write buffer里，这样能够减少写的访问磁盘的次数</p><h3 id="2-2-Workloads"><a href="#2-2-Workloads" class="headerlink" title="2.2 Workloads"></a>2.2 Workloads</h3><p>工作负载有两种，小的增删改的场景是LFS的优化场景，大文件的这里提到更侧重硬件方面的设计，但是LFS在大文件上表现也很好</p><blockquote><p>Small files usually result in small random disk I&#x2F;Os, and the creation and deletion times for such files are often dominated by updates to file system ‘‘metadata’’ (the data structures used to locate the attributes and blocks of the file).</p></blockquote><p>小文件增删的时间通常是由metadata(我觉得应该包含创建inode，把inode加到全局表，大概就这两个吧)决定的</p><h3 id="2-3-Problems-with-existing-file-systems"><a href="#2-3-Problems-with-existing-file-systems" class="headerlink" title="2.3 Problems with existing file systems"></a>2.3 Problems with existing file systems</h3><ul><li>以Unix FFS为例，每次创建文件的时候需要访问两次文件属性，文件数据、目录数据和目录属性又需要分别访问一次磁盘。在这样的系统写小文件的时候只有少于5%的磁盘带宽被使用了，其他时间都在寻道。</li><li>现有的文件系统尝试去同步地写（这里没太看懂，为了一致性不是必须要这样吗？看后面怎么解释了）：应用等待写完成，而不是把写挂在后台完成。</li></ul><p>看到这里感觉这个motivation讲的还是挺明确的，就是为了解决small size write的问题。</p><h2 id="Log-structured-file-systems"><a href="#Log-structured-file-systems" class="headerlink" title="Log-structured file systems"></a>Log-structured file systems</h2>]]></content>
     
     
       
       
     <summary type="html">&lt;p&gt;&lt;img src=&quot;/../picture/LFS-Reading/takagi.jpg&quot; alt=&quot;可可爱爱三人组&quot;&gt;&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;Log-structured file systems are based on the assumption </summary>
+&lt;h1 id=&quot;The-Design-and-Implementation-of-a-Log-Structured-File-System&quot;&gt;&lt;</summary>
       
     
     
