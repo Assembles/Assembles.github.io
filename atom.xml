@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-03-24T14:45:20.654Z</updated>
+  <updated>2023-03-27T11:55:43.484Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,11 +17,35 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>论文阅读 The Design and Implementation of a Log-Structured File System</title>
+    <link href="http://example.com/2023/03/27/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-The-Design-and-Implementation-of-a-Log-Structured-File-System/"/>
+    <id>http://example.com/2023/03/27/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-The-Design-and-Implementation-of-a-Log-Structured-File-System/</id>
+    <published>2023-03-27T11:45:02.000Z</published>
+    <updated>2023-03-27T11:55:43.484Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/../picture/LFS-Reading/takagi.jpg" alt="可可爱爱三人组"></p><blockquote><p>Log-structured file systems are based on the assumption that files are cached in main memory and that increasing memory sizes will make the caches more and more effective at satisfying read requests[1]. As a result, disk traffic will become dominated by writes.<br>这个文章是基于这样一种假设：如果cache够大，那么所有读请求都会被cache满足，那么硬盘层面的访问延迟就都会出现在写请求上</p></blockquote>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/../picture/LFS-Reading/takagi.jpg&quot; alt=&quot;可可爱爱三人组&quot;&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Log-structured file systems are based on the assumption </summary>
+      
+    
+    
+    
+    
+    <category term="Reading" scheme="http://example.com/tags/Reading/"/>
+    
+  </entry>
+  
+  <entry>
     <title>6-s081-lab3 Page Table</title>
     <link href="http://example.com/2023/03/24/6-s081-lab3-Page-Table/"/>
     <id>http://example.com/2023/03/24/6-s081-lab3-Page-Table/</id>
     <published>2023-03-24T14:38:22.000Z</published>
-    <updated>2023-03-24T14:45:20.654Z</updated>
+    <updated>2023-03-27T11:55:22.860Z</updated>
     
     <content type="html"><![CDATA[<p><img src="/../picture/6.s081lab3/takagi.jpg" alt="高木镇楼(什么时候我能自己画出这样的画就好了)"></p><h1 id="Page-Table"><a href="#Page-Table" class="headerlink" title="Page Table"></a>Page Table</h1>]]></content>
     
@@ -34,6 +58,8 @@
     
     
     
+    
+    <category term="OS" scheme="http://example.com/tags/OS/"/>
     
   </entry>
   

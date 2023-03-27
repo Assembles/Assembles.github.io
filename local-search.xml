@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>论文阅读 The Design and Implementation of a Log-Structured File System</title>
+    <link href="/2023/03/27/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-The-Design-and-Implementation-of-a-Log-Structured-File-System/"/>
+    <url>/2023/03/27/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-The-Design-and-Implementation-of-a-Log-Structured-File-System/</url>
+    
+    <content type="html"><![CDATA[<p><img src="/../picture/LFS-Reading/takagi.jpg" alt="可可爱爱三人组"></p><blockquote><p>Log-structured file systems are based on the assumption that files are cached in main memory and that increasing memory sizes will make the caches more and more effective at satisfying read requests[1]. As a result, disk traffic will become dominated by writes.<br>这个文章是基于这样一种假设：如果cache够大，那么所有读请求都会被cache满足，那么硬盘层面的访问延迟就都会出现在写请求上</p></blockquote>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>Reading</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>6-s081-lab3 Page Table</title>
     <link href="/2023/03/24/6-s081-lab3-Page-Table/"/>
     <url>/2023/03/24/6-s081-lab3-Page-Table/</url>
@@ -11,6 +30,12 @@
     <content type="html"><![CDATA[<p><img src="/../picture/6.s081lab3/takagi.jpg" alt="高木镇楼(什么时候我能自己画出这样的画就好了)"></p><h1 id="Page-Table"><a href="#Page-Table" class="headerlink" title="Page Table"></a>Page Table</h1>]]></content>
     
     
+    
+    <tags>
+      
+      <tag>OS</tag>
+      
+    </tags>
     
   </entry>
   
