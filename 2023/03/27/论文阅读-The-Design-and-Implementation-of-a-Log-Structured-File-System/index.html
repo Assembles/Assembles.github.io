@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/picture/LFS-Reading/takagi.jpg">
 <meta property="article:published_time" content="2023-03-27T11:45:02.000Z">
-<meta property="article:modified_time" content="2023-03-27T14:19:54.342Z">
+<meta property="article:modified_time" content="2023-03-28T10:18:50.990Z">
 <meta property="article:author" content="Dys">
 <meta property="article:tag" content="Reading">
 <meta name="twitter:card" content="summary_large_image">
@@ -282,7 +282,7 @@
 <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><blockquote>
 <p>Log-structured file systems are based on the assumption that files are cached in main memory and that increasing memory sizes will make the caches more and more effective at satisfying read requests[1]. As a result, disk traffic will become dominated by writes.</p>
 </blockquote>
-<p>这个文章是基于这样一种假设：如果cache够大，那么所有读请求都会被cache满足，那么硬盘层面的访问延迟就都会出现在写请求上。从现在的角度来看，SSD访问的延迟方面写延迟是远高于读延迟的，也就是说为了满足SSD的访问需要，通过这种方式构建文件系统减少随机写也是合理的。</p>
+<p>这个文章是基于这样一种假设：如果cache够大，那么所有读请求都会被cache满足，那么硬盘层面的访问延迟就都会出现在写请求上。从现在的角度来看，SSD访问的延迟方面写延迟是远高于读延迟的，也就是说为了满足SSD的访问需要，通过这种方式构建文件系统减少随机写也是合理的。这篇文章就提出了这样的一个文件系统，叫做Sprite LFS <del>雪碧日志文件系统</del></p>
 <h2 id="Design-for-file-systems-of-the-1990’s"><a href="#Design-for-file-systems-of-the-1990’s" class="headerlink" title="Design for file systems of the 1990’s"></a>Design for file systems of the 1990’s</h2><p>其实这段就是背景介绍</p>
 <h3 id="2-1-Technology"><a href="#2-1-Technology" class="headerlink" title="2.1 Technology"></a>2.1 Technology</h3><p>三个部分对文件系统设计非常重要：processors,disks,main memory.</p>
 <ul>

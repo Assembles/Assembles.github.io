@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/picture/6.s081lab1/takagi-1.jpg">
 <meta property="article:published_time" content="2023-03-13T16:13:41.000Z">
-<meta property="article:modified_time" content="2023-03-24T14:37:43.627Z">
+<meta property="article:modified_time" content="2023-03-29T10:44:31.243Z">
 <meta property="article:author" content="Dys">
 <meta property="article:tag" content="OS">
 <meta name="twitter:card" content="summary_large_image">
@@ -223,7 +223,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          846 字
+          1k 字
         
       </span>
     
@@ -234,7 +234,7 @@
         
         
         
-          8 分钟
+          9 分钟
         
       </span>
     
@@ -278,7 +278,7 @@
               <div class="markdown-body">
                 
                 <p><img src="/../picture/6.s081lab1/takagi-1.jpg" srcset="/img/loading.gif" lazyload></p>
-<h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><p>首先要说的是配置部分，其实整个lab的配置还是挺简单的，用的时间不是很多，我是在windows上做的，因为游戏本上之前装的虚拟机给我留下了很不好的印象，现在秉承着简便易用的原则我最开始就想尝试下能不能在wsl上搞<br>wsl安装随便搜搜就能找到，值得注意的是在Microsoft Store中安装的ubuntu版本需要是20.04，因为这个实验需要用到的riscv的一些库好像只支持这个版本，我最开始没仔细看安装的22.04，然后果不其然失败了，然后卸载重装。结果卸载还没卸载干净，还去查了查原因，用了个什么指令才搞好。<br>安装完就很简单了。指导书说可以直接在文件夹路径输入 \wsl$\ 进入根目录，我的电脑上还装了22.04，所以后面还有一项 \wsl$\Ubuntu-20.04\<br>安装完简简单单换个源，然后装下依赖，make qemu成功就能开始写代码啦！<br>本来其实是想在win11的终端界面用vim写的，但是他自带的vim切多窗口费劲以及回车不自动对齐等用起来很恶心的功能成功地在我写完第一个实验之后就把我劝退了。（话说最开始我还想多坚持一段时间还很用心地改了终端的默认配色来着）后面就是用vscode打开文件夹直接编辑代码了……<br>还有一件很神奇的事情，因为这个project提供的代码仓库没有主分支，只有每个实验对应的分支，所以只会有一个默认的分支，每次只有在向默认分支推送代码的时候才会算github的contribution。这就导致commit代码但是github上的contribution图没有变化。。。有点难定</p>
+<h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><p>首先要说的是配置部分，其实整个lab的配置还是挺简单的，用的时间不是很多，我是在windows上做的，因为游戏本上之前装的虚拟机给我留下了很不好的印象，现在秉承着简便易用的原则我最开始就想尝试下能不能在wsl上搞<br>wsl安装随便搜搜就能找到，值得注意的是在Microsoft Store中安装的ubuntu版本需要是20.04，因为这个实验需要用到的riscv的一些库好像只支持这个版本，我最开始没仔细看安装的22.04，然后果不其然失败了，然后卸载重装。结果卸载还没卸载干净，还去查了查原因，用了个什么指令才搞好。<br>安装完就很简单了。指导书说可以直接在文件夹路径输入 \wsl$\ 进入根目录，我的电脑上还装了22.04，所以后面还有一项 \wsl$\Ubuntu-20.04\<br>上面这种方案虽然是网站上给出的，但是一个问题是用不了vscode的c&#x2F;c++插件（因为插件没有安装到wsl的环境中去），所以可以先安装个wsl插件，然后在wsl里切到xv6的文件下然后输入<code>code .</code>，这样就会自动建立wsl与vscode之间的连接，最后在wsl的环境里再安装下c&#x2F;c++插件，这样就能使用跳转功能了<br>安装完简简单单换个源，然后装下依赖，make qemu成功就能开始写代码啦！<br>本来其实是想在win11的终端界面用vim写的，但是他自带的vim切多窗口费劲以及回车不自动对齐等用起来很恶心的功能成功地在我写完第一个实验之后就把我劝退了。（话说最开始我还想多坚持一段时间还很用心地改了终端的默认配色来着）后面就是用vscode打开文件夹直接编辑代码了……<br>还有一件很神奇的事情，因为这个project提供的代码仓库没有主分支，只有每个实验对应的分支，所以只会有一个默认的分支，每次只有在向默认分支推送代码的时候才会算github的contribution。这就导致commit代码但是github上的contribution图没有变化。。。有点难定</p>
 <h2 id="正片开始"><a href="#正片开始" class="headerlink" title="正片开始"></a>正片开始</h2><p>第一个实验就是非常经典的util实验了，这个跟我当时做的基本是一样的，但是说实话，现在我在写这个blog的时候刚写完lab4的一部分，但是我觉得我用在实验一的时间是最长的，而且还有一些东西没太搞懂</p>
 <h2 id="Sleep-easy"><a href="#Sleep-easy" class="headerlink" title="Sleep(easy)"></a>Sleep(easy)</h2><h2 id="PingPong-easy"><a href="#PingPong-easy" class="headerlink" title="PingPong(easy)"></a>PingPong(easy)</h2><h2 id="Primes-moderate-x2F-hard"><a href="#Primes-moderate-x2F-hard" class="headerlink" title="Primes(moderate&#x2F;hard)"></a>Primes(moderate&#x2F;hard)</h2><h2 id="Find-moderate"><a href="#Find-moderate" class="headerlink" title="Find(moderate)"></a>Find(moderate)</h2><h2 id="Xargs-moderate"><a href="#Xargs-moderate" class="headerlink" title="Xargs(moderate)"></a>Xargs(moderate)</h2><p>未完待续。。</p>
 
