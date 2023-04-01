@@ -16,16 +16,16 @@
   <meta name="author" content="Dys">
   <meta name="keywords" content="">
   
-    <meta name="description" content="The Design and Implementation of a Log-Structured File System网上的关于LFS的资料有点松散了，看到最后感觉还是得追根溯源来看看这篇论文 Introduction Log-structured file systems are based on the assumption that files are cached in main m">
+    <meta name="description" content="The Design and Implementation of a Log-Structured File System网上的关于LFS的资料有点松散了，看到最后感觉还是得追根溯源来看看这篇论文 看到一半的中途更新这篇论文虽然是我目前找到的几乎可以说是最久远的文献了，但是很多地方介绍的不是非常详细，对于初学者来说不是很友好，前段时间偶然间看到了一篇很不错的文章：https:&#x2F;&#x2F;pages.cs">
 <meta property="og:type" content="article">
 <meta property="og:title" content="论文阅读 The Design and Implementation of a Log-Structured File System">
 <meta property="og:url" content="http://example.com/2023/03/27/%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB-The-Design-and-Implementation-of-a-Log-Structured-File-System/index.html">
 <meta property="og:site_name" content="Dys&#39;s Blog">
-<meta property="og:description" content="The Design and Implementation of a Log-Structured File System网上的关于LFS的资料有点松散了，看到最后感觉还是得追根溯源来看看这篇论文 Introduction Log-structured file systems are based on the assumption that files are cached in main m">
+<meta property="og:description" content="The Design and Implementation of a Log-Structured File System网上的关于LFS的资料有点松散了，看到最后感觉还是得追根溯源来看看这篇论文 看到一半的中途更新这篇论文虽然是我目前找到的几乎可以说是最久远的文献了，但是很多地方介绍的不是非常详细，对于初学者来说不是很友好，前段时间偶然间看到了一篇很不错的文章：https:&#x2F;&#x2F;pages.cs">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/picture/LFS-Reading/takagi.jpg">
 <meta property="article:published_time" content="2023-03-27T11:45:02.000Z">
-<meta property="article:modified_time" content="2023-03-28T10:18:50.990Z">
+<meta property="article:modified_time" content="2023-04-01T08:20:36.114Z">
 <meta property="article:author" content="Dys">
 <meta property="article:tag" content="Reading">
 <meta name="twitter:card" content="summary_large_image">
@@ -223,7 +223,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.3k 字
+          2.5k 字
         
       </span>
     
@@ -234,7 +234,7 @@
         
         
         
-          20 分钟
+          21 分钟
         
       </span>
     
@@ -279,6 +279,7 @@
                 
                 <p><img src="/../picture/LFS-Reading/takagi.jpg" srcset="/img/loading.gif" lazyload alt="可可爱爱三人组"></p>
 <h1 id="The-Design-and-Implementation-of-a-Log-Structured-File-System"><a href="#The-Design-and-Implementation-of-a-Log-Structured-File-System" class="headerlink" title="The Design and Implementation of a Log-Structured File System"></a>The Design and Implementation of a Log-Structured File System</h1><p>网上的关于LFS的资料有点松散了，看到最后感觉还是得追根溯源来看看这篇论文</p>
+<h2 id="看到一半的中途更新"><a href="#看到一半的中途更新" class="headerlink" title="看到一半的中途更新"></a>看到一半的中途更新</h2><p>这篇论文虽然是我目前找到的几乎可以说是最久远的文献了，但是很多地方介绍的不是非常详细，对于初学者来说不是很友好，前段时间偶然间看到了一篇很不错的文章：<a target="_blank" rel="noopener" href="https://pages.cs.wisc.edu/~remzi/OSTEP/file-lfs.pdf">https://pages.cs.wisc.edu/~remzi/OSTEP/file-lfs.pdf</a><br>这个文章对于整体结构的描述非常详细，结合着来看这篇文章感觉收获很大！</p>
 <h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><blockquote>
 <p>Log-structured file systems are based on the assumption that files are cached in main memory and that increasing memory sizes will make the caches more and more effective at satisfying read requests[1]. As a result, disk traffic will become dominated by writes.</p>
 </blockquote>
