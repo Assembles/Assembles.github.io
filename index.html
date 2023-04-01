@@ -233,7 +233,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2023/03/31/6-s081-lab8-Lock/" target="_self">
         <div>
-          
+          Lock这个实验给我的感觉就是在尝试与锁去妥协，很多场景为了并发的考虑必须去用锁，但是很多自旋锁因为一直在while循环耗时太长，应该就是锁争用导致的阻塞，所以需要许多手段去尽可能减少锁的争用。 Memory allocatorlab1 是针对memory allocator的优化。在kalloctest中之所以会出现争用，最根本的问题就是因为只有一个free list，所有的加锁申请都要申请这
         </div>
       </a>
 
