@@ -20,6 +20,15 @@
   </url>
   
   <url>
+    <loc>http://example.com/daily.html</loc>
+    
+    <lastmod>2023-04-19</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>http://example.com/2023/04/12/csapp-buflab/</loc>
     
     <lastmod>2023-04-19</lastmod>
