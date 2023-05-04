@@ -1,3 +1,5 @@
+http://example.com/2023/05/04/qemu/
+http://example.com/2023/04/19/daily/
 http://example.com/2023/04/12/csapp-buflab/
 http://example.com/2023/03/31/6-s081-lab6-Multithreading/
 http://example.com/2023/03/31/6-s081-lab8-Lock/
