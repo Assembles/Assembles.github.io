@@ -1,4 +1,4 @@
-http://example.com/2023/07/17/%E7%94%9F%E6%88%90ko%E6%96%87%E4%BB%B6/
+http://example.com/2023/07/17/koFile/
 http://example.com/2023/05/04/qemu/
 http://example.com/2023/04/19/daily/
 http://example.com/daily.html
