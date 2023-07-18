@@ -29,7 +29,7 @@
 <meta property="og:image" content="http://example.com/picture/koFile/samebutnotuseful.png">
 <meta property="og:image" content="http://example.com/picture/koFile/symlink.png">
 <meta property="article:published_time" content="2023-07-17T13:58:00.000Z">
-<meta property="article:modified_time" content="2023-07-18T14:45:31.151Z">
+<meta property="article:modified_time" content="2023-07-18T14:52:19.265Z">
 <meta property="article:author" content="Dys">
 <meta property="article:tag" content="OS">
 <meta name="twitter:card" content="summary_large_image">
@@ -227,7 +227,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.6k 字
+          2.7k 字
         
       </span>
     
@@ -238,7 +238,7 @@
         
         
         
-          22 分钟
+          23 分钟
         
       </span>
     
@@ -295,8 +295,9 @@
 <p>第二天又遇到了个问题，就是如果要用f2fs，那就需要mkfs工具，但是我上面用的femu镜像莫名其妙连不上网，于是各种尝试无果的情况下我直接换了个能用的镜像，然后在里面下载好了mkfs.f2fs，但是发现非常奇怪的问题是像昨天的方法用了之后还是匹配不上，很怪<br><img src="/../picture/koFile/samebutnotuseful.png" srcset="/img/loading.gif" lazyload alt="这两个一个是能用的，一个是仿照能用的配的名字，很神奇的就是改名字的用不了"></p>
 <p>无奈之下只能再尝试能不能在femu里编译，发现突然又可以了，编译用到的makefile文件如下：</p>
 <figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-comment"># SPDX-License-Identifier: GPL-2.0</span><br>obj-<span class="hljs-variable">$(CONFIG_F2FS_FS)</span> += f2fs.o<br><br>f2fs-y		:= dir.o file.o inode.o namei.o hash.o super.o inline.o<br>f2fs-y		+= checkpoint.o gc.o data.o node.o segment.o recovery.o<br>f2fs-y		+= shrinker.o extent_cache.o sysfs.o<br>f2fs-<span class="hljs-variable">$(CONFIG_F2FS_STAT_FS)</span> += debug.o<br>f2fs-<span class="hljs-variable">$(CONFIG_F2FS_FS_XATTR)</span> += xattr.o<br>f2fs-<span class="hljs-variable">$(CONFIG_F2FS_FS_POSIX_ACL)</span> += acl.o<br>f2fs-<span class="hljs-variable">$(CONFIG_F2FS_IO_TRACE)</span> += trace.o<br>f2fs-<span class="hljs-variable">$(CONFIG_FS_VERITY)</span> += verity.o<br><br>KERNEL_DIR:=/lib/modules/<span class="hljs-variable">$(<span class="hljs-built_in">shell</span> uname -r)</span>/build<br><br>PWD:=/home/folder2/linux-5.4/fs/f2fs<br><br><span class="hljs-section">default:</span><br>	make -C <span class="hljs-variable">$(KERNEL_DIR)</span> M=<span class="hljs-variable">$(PWD)</span> modules<br><br><span class="hljs-section">clean:</span><br>	rm-rf *.o *.mod.c *.ko Module.symvers modules.order<br></code></pre></td></tr></table></figure>
-<p>感觉昨天用不了的原因可能是KERNEL_DIR不太对？昨天我虽然用的是&#x2F;usr&#x2F;src但是具体到了里面的f2fs文件夹，有可能是这个原因？有点忘了昨天的错误长啥样了。。。这两天遇到的奇奇怪怪的错误好多。。。<br>然后今天看了下&#x2F;usr&#x2F;src确实是软连接到&#x2F;lib&#x2F;modules的，这样看跟昨天用的也都是同一个文件夹，感觉很神奇~<br><img src="/../picture/koFile/symlink.png" srcset="/img/loading.gif" lazyload alt="软连接"></p>
-<p>为什么过了这么久才继续写呢？<br>因为前几个月都在疯狂地调研<del>调研</del>好多论文要看。。。毕竟永远无法看完这个领域的文章，只能大致判断这个方向有没有人做，值不值得做，看完了可能对原来的idea还有点改进的想法，所以看了好久好久。。。距离上次写竟然已经有两个月了，时间过得好快~ 看了下之前自己私下写的东西，发现一直在反复思考的点都是motivation~</p>
+<p>感觉昨天用不了的原因可能是KERNEL_DIR不太对？<strong>昨天我虽然用的是&#x2F;usr&#x2F;src但是具体到了里面的f2fs文件夹，有可能是这个原因？</strong>有点忘了昨天的错误长啥样了。。。这两天遇到的奇奇怪怪的错误好多。。。<br>然后今天看了下&#x2F;usr&#x2F;src确实是软连接到&#x2F;lib&#x2F;modules的，这样看跟昨天用的也都是同一个文件夹，感觉很神奇~<br><img src="/../picture/koFile/symlink.png" srcset="/img/loading.gif" lazyload alt="软连接"></p>
+<p>总结一下就是直接把上面这个makefile放到femu里sudo make一下就能生成相应的模块了，这篇文章其他的内容都是漫长的探索，对真正跑起来项目帮助并不是很大&#x3D; &#x3D;</p>
+<p>为什么过了这么久才继续写呢？<br>因为前几个月都在疯狂地调研~ 调研~ 好多论文要看。。。毕竟永远无法看完这个领域的文章，只能大致判断这个方向有没有人做，值不值得做，看完了可能对原来的idea还有点改进的想法，所以看了好久好久。。。其实就像这次写的东西一样，可能做了好久探索了好多奇奇怪怪的内容，最后发现又回到原点了……距离上次写竟然已经有两个月了，时间过得好快~ 看了下之前自己私下写的东西，发现一直在反复思考的点都是motivation~ 继续努力吧！</p>
 
                 
               </div>
