@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-07-18T14:52:19.265Z</updated>
+  <updated>2023-07-24T07:48:47.337Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>femu</title>
+    <link href="http://example.com/2023/07/24/femu/"/>
+    <id>http://example.com/2023/07/24/femu/</id>
+    <published>2023-07-24T07:44:50.000Z</published>
+    <updated>2023-07-24T07:48:47.337Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="/../picture/femu/bocchi.jpg" alt=":)"></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;img src=&quot;/../picture/femu/bocchi.jpg&quot; alt=&quot;:)&quot;&gt;&lt;/p&gt;
+</summary>
+      
+    
+    
+    
+    
+    <category term="simulator" scheme="http://example.com/tags/simulator/"/>
+    
+  </entry>
   
   <entry>
     <title>koFile</title>
@@ -436,28 +459,6 @@
     
     
     <category term="CMU15445" scheme="http://example.com/tags/CMU15445/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>first blog</title>
-    <link href="http://example.com/2022/12/02/first-blog/"/>
-    <id>http://example.com/2022/12/02/first-blog/</id>
-    <published>2022-12-02T10:47:05.000Z</published>
-    <updated>2022-12-02T16:18:59.846Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="first-blog"><a href="#first-blog" class="headerlink" title="first blog!"></a>first blog!</h1><p>第一次尝试写博客。。主要是为了记录下最近在做的数据库实验，方便以后回来查找<br>后面有机会的话可能会把看的论文和写的项目顺便更新上来？</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;h1 id=&quot;first-blog&quot;&gt;&lt;a href=&quot;#first-blog&quot; class=&quot;headerlink&quot; title=&quot;first blog!&quot;&gt;&lt;/a&gt;first blog!&lt;/h1&gt;&lt;p&gt;第一次尝试写博客。。主要是为了记录下最近在做的数据库实验，方便以后回来查</summary>
-      
-    
-    
-    
-    
-    <category term="casual" scheme="http://example.com/tags/casual/"/>
     
   </entry>
   

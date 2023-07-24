@@ -1,3 +1,4 @@
+http://example.com/2023/07/24/femu/
 http://example.com/2023/07/17/koFile/
 http://example.com/2023/05/04/qemu/
 http://example.com/2023/04/19/daily/
@@ -30,3 +31,4 @@ http://example.com/tags/%E2%80%9CCMU15445/
 http://example.com/tags/OS/
 http://example.com/tags/Reading/
 http://example.com/tags/CSAPP/
+http://example.com/tags/simulator/
