@@ -16,14 +16,16 @@
   <meta name="author" content="Dys">
   <meta name="keywords" content="">
   
-    <meta property="og:type" content="article">
+    <meta name="description" content="Femu基于Qemu开发，能够模拟SSD。具体来说，通过模拟读写时延，让虚拟机的用户感觉到虚拟机中好像真的有SSD存在。最近在研究Femu里面的代码，简单记录下。 blackbox模式下需要在代码里手动调整SSD大小，只在编译的sh脚本里修改是没用的，需要修改ssd_init_params中的这段代码 1234567spp-&gt;secsz &#x3D; 512;spp-&gt;secs_per_pg">
+<meta property="og:type" content="article">
 <meta property="og:title" content="femu">
 <meta property="og:url" content="http://example.com/2023/07/24/femu/index.html">
 <meta property="og:site_name" content="Dys&#39;s Blog">
+<meta property="og:description" content="Femu基于Qemu开发，能够模拟SSD。具体来说，通过模拟读写时延，让虚拟机的用户感觉到虚拟机中好像真的有SSD存在。最近在研究Femu里面的代码，简单记录下。 blackbox模式下需要在代码里手动调整SSD大小，只在编译的sh脚本里修改是没用的，需要修改ssd_init_params中的这段代码 1234567spp-&gt;secsz &#x3D; 512;spp-&gt;secs_per_pg">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/picture/femu/bocchi.jpg">
 <meta property="article:published_time" content="2023-07-24T07:44:50.000Z">
-<meta property="article:modified_time" content="2023-07-24T07:48:47.337Z">
+<meta property="article:modified_time" content="2023-07-24T12:24:38.894Z">
 <meta property="article:author" content="Dys">
 <meta property="article:tag" content="simulator">
 <meta name="twitter:card" content="summary_large_image">
@@ -221,7 +223,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          0 字
+          437 字
         
       </span>
     
@@ -232,7 +234,7 @@
         
         
         
-          1 分钟
+          4 分钟
         
       </span>
     
@@ -276,6 +278,11 @@
               <div class="markdown-body">
                 
                 <p><img src="/../picture/femu/bocchi.jpg" srcset="/img/loading.gif" lazyload alt=":)"></p>
+<p>Femu基于Qemu开发，能够模拟SSD。具体来说，通过模拟读写时延，让虚拟机的用户感觉到虚拟机中好像真的有SSD存在。<br>最近在研究Femu里面的代码，简单记录下。</p>
+<p>blackbox模式下需要在代码里手动调整SSD大小，只在编译的sh脚本里修改是没用的，需要修改<code>ssd_init_params</code>中的这段代码</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs xl"><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>secsz = <span class="hljs-number">512</span>;<br><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>secs_per_pg = <span class="hljs-number">8</span>;<br><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>pgs_per_blk = <span class="hljs-number">256</span>;<br><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>blks_per_pl = <span class="hljs-number">256</span>; <span class="hljs-comment">/* 16GB */</span><br><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>pls_per_lun = <span class="hljs-number">1</span>;<br><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>luns_per_ch = <span class="hljs-number">8</span>;<br><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>nchs = <span class="hljs-number">8</span>;<br></code></pre></td></tr></table></figure>
+<p>如果没改的话会有问题，比如说像是在做gc方面的测试的时候，如果这里没有改的话会发现可能触发gc的时机跟自己想的不一样，这是因为这里写死的ssd大小与外面脚本中设定的大小不一致导致的</p>
+<p>代码中的line结构是一种用于gc的数据结构，ssd中没有这个数据结构</p>
 
                 
               </div>

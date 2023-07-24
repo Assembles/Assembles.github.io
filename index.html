@@ -233,7 +233,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2023/07/24/femu/" target="_self">
         <div>
-          
+          Femu基于Qemu开发，能够模拟SSD。具体来说，通过模拟读写时延，让虚拟机的用户感觉到虚拟机中好像真的有SSD存在。最近在研究Femu里面的代码，简单记录下。 blackbox模式下需要在代码里手动调整SSD大小，只在编译的sh脚本里修改是没用的，需要修改ssd_init_params中的这段代码 1234567spp-&gt;secsz = 512;spp-&gt;secs_per_pg
         </div>
       </a>
 

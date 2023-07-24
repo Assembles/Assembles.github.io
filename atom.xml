@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-07-24T07:48:47.337Z</updated>
+  <updated>2023-07-24T12:24:38.894Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,15 +21,15 @@
     <link href="http://example.com/2023/07/24/femu/"/>
     <id>http://example.com/2023/07/24/femu/</id>
     <published>2023-07-24T07:44:50.000Z</published>
-    <updated>2023-07-24T07:48:47.337Z</updated>
+    <updated>2023-07-24T12:24:38.894Z</updated>
     
-    <content type="html"><![CDATA[<p><img src="/../picture/femu/bocchi.jpg" alt=":)"></p>]]></content>
+    <content type="html"><![CDATA[<p><img src="/../picture/femu/bocchi.jpg" alt=":)"></p><p>Femu基于Qemu开发，能够模拟SSD。具体来说，通过模拟读写时延，让虚拟机的用户感觉到虚拟机中好像真的有SSD存在。<br>最近在研究Femu里面的代码，简单记录下。</p><p>blackbox模式下需要在代码里手动调整SSD大小，只在编译的sh脚本里修改是没用的，需要修改<code>ssd_init_params</code>中的这段代码</p><figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs xl"><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>secsz = <span class="hljs-number">512</span>;<br><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>secs_per_pg = <span class="hljs-number">8</span>;<br><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>pgs_per_blk = <span class="hljs-number">256</span>;<br><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>blks_per_pl = <span class="hljs-number">256</span>; <span class="hljs-comment">/* 16GB */</span><br><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>pls_per_lun = <span class="hljs-number">1</span>;<br><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>luns_per_ch = <span class="hljs-number">8</span>;<br><span class="hljs-function"><span class="hljs-title">spp</span>-&gt;</span>nchs = <span class="hljs-number">8</span>;<br></code></pre></td></tr></table></figure><p>如果没改的话会有问题，比如说像是在做gc方面的测试的时候，如果这里没有改的话会发现可能触发gc的时机跟自己想的不一样，这是因为这里写死的ssd大小与外面脚本中设定的大小不一致导致的</p><p>代码中的line结构是一种用于gc的数据结构，ssd中没有这个数据结构</p>]]></content>
     
     
       
       
     <summary type="html">&lt;p&gt;&lt;img src=&quot;/../picture/femu/bocchi.jpg&quot; alt=&quot;:)&quot;&gt;&lt;/p&gt;
-</summary>
+&lt;p&gt;Femu基于Qemu开发，能够模拟SSD。具体来说，通过模拟读写时延，让虚拟机的用户感觉到虚拟机中好像真的有SSD存在。&lt;br&gt;最近在研究Femu里面的代码，简单</summary>
       
     
     
