@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/picture/linux%E6%A8%A1%E5%9D%97/bokita.jpg">
 <meta property="article:published_time" content="2023-08-03T08:01:34.000Z">
-<meta property="article:modified_time" content="2023-08-04T15:19:45.512Z">
+<meta property="article:modified_time" content="2023-08-04T15:27:51.904Z">
 <meta property="article:author" content="Dys">
 <meta property="article:tag" content="OS">
 <meta name="twitter:card" content="summary_large_image">
@@ -223,7 +223,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          4.1k 字
+          4.5k 字
         
       </span>
     
@@ -234,7 +234,7 @@
         
         
         
-          35 分钟
+          38 分钟
         
       </span>
     
@@ -285,6 +285,7 @@
 <figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs makefile">KERNELDIR=/lib/modules/<span class="hljs-variable">$(<span class="hljs-built_in">shell</span> uname -r)</span>/build<br>PWD:=<span class="hljs-variable">$(<span class="hljs-built_in">shell</span> pwd)</span><br><span class="hljs-section">obj-m:= helloworld.o</span><br><span class="hljs-section">modules:</span><br>	<span class="hljs-variable">$(MAKE)</span> -C <span class="hljs-variable">$(KERNELDIR)</span> M=<span class="hljs-variable">$(PWD)</span> modules<br><span class="hljs-section">clean:</span><br>	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions<br><span class="hljs-meta"><span class="hljs-keyword">.PHONY</span>: modules clean</span><br></code></pre></td></tr></table></figure>
 
 <p>-C 是所需要的内核文件路径，一般这样写就可以<br>M是当前文件夹路径</p>
+<p>这里的$(MAKE) 就相当于make，-C选项的作用是指将当前工作目录转移到你所指定的位置。“M &#x3D;”选项的作用是，当用户需要以某个内核为基础编译一个外部模块的话，需要在make modules 命令中加入“M &#x3D; dir”，程序会自动到你所指定的dir目录中查找模块源码，将其编译，生成KO文件。 注释：这个是编译driver module的时候必备的makefile 相当于先跳转到 - C 指定的内核目录，然后执行这个目录的makefile M &#x3D; XXX modules，相当于在当前系统内核根目录下执行make M &#x3D; XXX modules 进行模块的编译，编译成xx.ko.这样你的modules就可以在任何其他位置，而不用必须在内核文件下面了。</p>
 <p>直接sudo make，Makefile会默认执行第一个伪目标，所以会默认执行sudo make modules</p>
 <p>正常情况下insmod与rmmod不会在屏幕上看到输出，但是输出会到系统日志文件中，如&#x2F;var&#x2F;log&#x2F;syslog，syslog跟其他日志混杂，可以只用kern.log，这里可以这样打印结果</p>
 <figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stata"><span class="hljs-keyword">cat</span> /<span class="hljs-keyword">var</span>/<span class="hljs-keyword">log</span>/kern.<span class="hljs-keyword">log</span> | tail -2<br></code></pre></td></tr></table></figure>
