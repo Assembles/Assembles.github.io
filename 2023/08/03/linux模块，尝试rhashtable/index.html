@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/picture/linux%E6%A8%A1%E5%9D%97/bokita.jpg">
 <meta property="article:published_time" content="2023-08-03T08:01:34.000Z">
-<meta property="article:modified_time" content="2023-08-03T08:28:06.725Z">
+<meta property="article:modified_time" content="2023-08-04T15:19:45.512Z">
 <meta property="article:author" content="Dys">
 <meta property="article:tag" content="OS">
 <meta name="twitter:card" content="summary_large_image">
@@ -223,7 +223,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.1k 字
+          4.1k 字
         
       </span>
     
@@ -234,7 +234,7 @@
         
         
         
-          26 分钟
+          35 分钟
         
       </span>
     
@@ -296,6 +296,13 @@
 <p>当然，每次改完之后都需要make module-rmmod-insmod-cat，这样一个个输入指令太过于麻烦，可以在makefile文件里一步到位，我新增了test伪目标，然后这样修改：</p>
 <figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs makefile">KERNELDIR=/lib/modules/<span class="hljs-variable">$(<span class="hljs-built_in">shell</span> uname -r)</span>/build<br>PWD:=<span class="hljs-variable">$(<span class="hljs-built_in">shell</span> pwd)</span><br><span class="hljs-section">obj-m:= helloworld.o</span><br><span class="hljs-section">modules:</span><br>	<span class="hljs-variable">$(MAKE)</span> -C <span class="hljs-variable">$(KERNELDIR)</span> M=<span class="hljs-variable">$(PWD)</span> modules<br><span class="hljs-section">test:</span><br>	sudo rmmod helloworld<br>	sudo make modules<br>	sudo insmod helloworld.ko<br>	cat /var/log/kern.log | tail -2<br><span class="hljs-section">clean:</span><br>	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions<br><span class="hljs-meta"><span class="hljs-keyword">.PHONY</span>: modules clean test</span><br></code></pre></td></tr></table></figure>
 <p>这样每次改完代码之后直接make test就好了</p>
+<h2 id="摘抄一点关于pr-xx-内容"><a href="#摘抄一点关于pr-xx-内容" class="headerlink" title="摘抄一点关于pr_xx()内容"></a>摘抄一点关于pr_xx()内容</h2><p>引用自<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/591630333">链接</a><br>在使用printk的时候需要手动添加输出等级KERN_INFO、KERN_WARNING等，这样还是有些麻烦。因此，Linux内核也对printk进行了进一步的封装。</p>
+<p>Linux内核将每一个输出等级封装为pr_xx()函数，例如，输出等级KERN_INFO封装为pr_info()，输出等级KERN_WARNING封装为pr_warn()。具体如下：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">#define pr<span class="hljs-constructor">_emerg(<span class="hljs-params">fmt</span>, <span class="hljs-operator">...</span>)</span> \<br> printk(KERN_EMERG pr<span class="hljs-constructor">_fmt(<span class="hljs-params">fmt</span>)</span>, ##__VA_ARGS__)<br><br>#define pr<span class="hljs-constructor">_alert(<span class="hljs-params">fmt</span>, <span class="hljs-operator">...</span>)</span> \<br> printk(KERN_ALERT pr<span class="hljs-constructor">_fmt(<span class="hljs-params">fmt</span>)</span>, ##__VA_ARGS__)<br><br>#define pr<span class="hljs-constructor">_crit(<span class="hljs-params">fmt</span>, <span class="hljs-operator">...</span>)</span> \<br> printk(KERN_CRIT pr<span class="hljs-constructor">_fmt(<span class="hljs-params">fmt</span>)</span>, ##__VA_ARGS__)<br><br>#define pr<span class="hljs-constructor">_err(<span class="hljs-params">fmt</span>, <span class="hljs-operator">...</span>)</span> \<br> printk(KERN_ERR pr<span class="hljs-constructor">_fmt(<span class="hljs-params">fmt</span>)</span>, ##__VA_ARGS__)<br><br>#define pr<span class="hljs-constructor">_warn(<span class="hljs-params">fmt</span>, <span class="hljs-operator">...</span>)</span> \<br> printk(KERN_WARNING pr<span class="hljs-constructor">_fmt(<span class="hljs-params">fmt</span>)</span>, ##__VA_ARGS__)<br><br>#define pr<span class="hljs-constructor">_notice(<span class="hljs-params">fmt</span>, <span class="hljs-operator">...</span>)</span> \<br> printk(KERN_NOTICE pr<span class="hljs-constructor">_fmt(<span class="hljs-params">fmt</span>)</span>, ##__VA_ARGS__)<br><br>#define pr<span class="hljs-constructor">_info(<span class="hljs-params">fmt</span>, <span class="hljs-operator">...</span>)</span> \<br> printk(KERN_INFO pr<span class="hljs-constructor">_fmt(<span class="hljs-params">fmt</span>)</span>, ##__VA_ARGS__)<br><br>#define pr<span class="hljs-constructor">_err(<span class="hljs-params">fmt</span>, <span class="hljs-operator">...</span>)</span> \<br> printk(KERN_ERR pr<span class="hljs-constructor">_fmt(<span class="hljs-params">fmt</span>)</span>, ##__VA_ARGS__)<br></code></pre></td></tr></table></figure>
+
+<p>这里对输出等级为KERN_DEBUG的封装是比较特殊的，因为debug等级比较常用，内核对pr_debug()分为了三种情况：</p>
+<p>如果设置了 CONFIG_DYNAMIC_DEBUG，则此pr_debug()扩展为 dynamic_pr_debug()，主要用于动态输出。 否则，如果定义了 DEBUG宏，则它等同于具有 KERN_DEBUG 日志级别的 printk。 如果未定义 DEBUG，则它什么都不做。</p>
+<p>以上都是摘抄来的内容，因为printk写起来还是有点麻烦，所以感觉用这个替代下还挺方便的，接下来写代码尝试用用</p>
 
                 
               </div>
