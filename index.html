@@ -225,6 +225,46 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/2023/08/15/echo%E9%87%8D%E5%AE%9A%E5%90%91permission-denied/" target="_self">
+          echo重定向permission denied
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/15/echo%E9%87%8D%E5%AE%9A%E5%90%91permission-denied/" target="_self">
+        <div>
+          有的时候，某些功能需要向一些指定的文件中写入内容，比如：如果有时候kernel显示BUG: soft lockup - CPU#14 stuck for 22s! [init:1]之类的错误，那么一个可行的方法是 1echo 1 &gt; /proc/sys/kernel/softlockup_panic 这样能够让softlockup触发panic，进而能够显示调用栈，从而找到错误但是直接运行会
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-15 22:11" pubdate>
+              2023-08-15
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/OS/">#OS</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/2023/08/15/kernel-%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/" target="_self">
           kernel 代码踩坑
         </a>
@@ -247,6 +287,13 @@
           </div>
         
         
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/kernel/">#kernel</a>
+            
+          </div>
         
       </div>
     </article>
@@ -540,46 +587,6 @@
       <a class="index-excerpt index-excerpt__noimg" href="/2023/03/31/6-s081-lab8-Lock/" target="_self">
         <div>
           Lock这个实验给我的感觉就是在尝试与锁去妥协，很多场景为了并发的考虑必须去用锁，但是很多自旋锁因为一直在while循环耗时太长，应该就是锁争用导致的阻塞，所以需要许多手段去尽可能减少锁的争用。 Memory allocatorlab1 是针对memory allocator的优化。在kalloctest中之所以会出现争用，最根本的问题就是因为只有一个free list，所有的加锁申请都要申请这
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-03-31 14:38" pubdate>
-              2023-03-31
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/OS/">#OS</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2023/03/31/6-s081-lab6-Multithreading/" target="_self">
-          6-s081-lab6-Multithreading
-        </a>
-      </h1>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/03/31/6-s081-lab6-Multithreading/" target="_self">
-        <div>
-          MultithreadingUthread这个实验比较简单，看完xv6 book相应章节之后对内核中thread的切换有了一定的了解之后就可以完成。首先为了能够保存线程的状态，最重要的就是能够保存当前的上下文，用于后续切换回这个线程的时候恢复现场。 12345678910111213141516171819202122232425struct context &#123;  uint64 ra;
         </div>
       </a>
 
