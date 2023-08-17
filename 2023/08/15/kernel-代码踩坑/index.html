@@ -27,7 +27,7 @@
 <meta property="og:image" content="http://example.com/picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/memcpy_bug.png">
 <meta property="og:image" content="http://example.com/picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/rcu_bug.png">
 <meta property="article:published_time" content="2023-08-15T12:02:56.000Z">
-<meta property="article:modified_time" content="2023-08-15T15:09:02.336Z">
+<meta property="article:modified_time" content="2023-08-17T13:46:59.552Z">
 <meta property="article:author" content="Dys">
 <meta property="article:tag" content="kernel">
 <meta name="twitter:card" content="summary_large_image">
@@ -225,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          582 字
+          1.2k 字
         
       </span>
     
@@ -236,7 +236,7 @@
         
         
         
-          5 分钟
+          10 分钟
         
       </span>
     
@@ -279,7 +279,10 @@
             
               <div class="markdown-body">
                 
-                <p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/hollow.jpg" srcset="/img/loading.gif" lazyload alt="peace &amp; love"><br>刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。<br><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/memcpy_bug.png" srcset="/img/loading.gif" lazyload alt="memcmp导致内核崩掉"><br>最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不支持这么长的char数组？但是发现其他内核文件虽然没有这么长的，但是大于5的uint8数组也是存在的，而memcmp作为比较的默认方法又怎么会出错呢？后来我又想自己写个方法覆盖掉系统原有的memcmp方法，但是中途作罢了，感觉用处不大。最后结合一些信息，我又猜测可能是rhashtable里面存储的元素的问题，内核栈好像是比较小的，而且经常清空，所以如果我添加栈上的元素的话后来可能在比较的时候就会发现访问的是一段不合法的地址，所以改成kzalloc方法分配新的entry就好啦<br><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/rcu_bug.png" srcset="/img/loading.gif" lazyload alt="rcu导致的soft lock"><br>这个也很奇怪，我在单独测试rhashtable的时候还没问题，在加到文件系统的时候就出了问题，后来发现有的博主写的代码里不像lwn网站上的那样还写了rcu lock，又查了下rhashtable_look之类的实现，发现里面好像自带了加锁的操作？于是直接把这些乱七八糟的结构都删了，就没有这样的问题了</p>
+                <p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/hollow.jpg" srcset="/img/loading.gif" lazyload alt="peace &amp; love"><br>刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。<br><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/memcpy_bug.png" srcset="/img/loading.gif" lazyload alt="memcmp导致内核崩掉"><br>最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不支持这么长的char数组？但是发现其他内核文件虽然没有这么长的，但是大于5的uint8数组也是存在的，而memcmp作为比较的默认方法又怎么会出错呢？后来我又想自己写个方法覆盖掉系统原有的memcmp方法，但是中途作罢了，感觉用处不大。最后结合一些信息，我又猜测可能是rhashtable里面存储的元素的问题，内核栈好像是比较小的，而且经常清空，所以如果我添加栈上的元素的话后来可能在比较的时候就会发现访问的是一段不合法的地址，所以改成kzalloc方法分配新的entry就好啦</p>
+<h3 id="内核栈"><a href="#内核栈" class="headerlink" title="内核栈"></a>内核栈</h3><blockquote>
+<p>在用户空间，我们以前所讨论到的那些分配的例子，不少都可以在栈上发生。因为我们毕竟可以事先知道所分配空间的大小。用户空间能够奢侈地负担起非常大的栈，而且栈空间还可以动态增长，相反，内核却不能这么奢侈——内核栈小而固定。当给每个进程分配一个固定大小的小栈后，不但可以减少内存的消耗，而且内核也无需负担太重的栈管理任务。<br>每个进程的内核栈大小既依赖体系结构，也与编译时的选项有关，历史上，每个进程都有两页的内核栈。因为32位和64位体系结构的页面大小分别是4KB和8KB，所以通常他们的内核栈的大小为8KB和16KB。<br>在任意一个函数中，你都必须尽量节省栈资源。这并不难，也没有什么窍门，只需要在具体的函数中让所有的局部变量所占空间之和不要超过几百字节。在栈上进行大量的静态分配（比如分配大型数组或大型结构体）是很危险的下。要不然，在内核中和在用户空间中进行的栈分配就没有什么区别了。栈溢出时悄无声息，但势必会引起严重的问题。因为内核没有在管理内核栈上做足工作，因此，当栈溢出时，多出的数据就会直接溢出来，覆盖掉紧邻栈堆末端的东西。首先面临考验的就是thread_info结构。在堆栈之外，任何内核数据都可能存在潜在的危险。当栈溢出时，最好的情况是机器宕机，最坏的情况是悄无声息的破坏数据。<br>因此，进行动态分配是一种明智的选择，本章前面有关大块内存的分配就是采用这种方式。<br><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/rcu_bug.png" srcset="/img/loading.gif" lazyload alt="rcu导致的soft lock"><br>这个也很奇怪，我在单独测试rhashtable的时候还没问题，在加到文件系统的时候就出了问题，后来发现有的博主写的代码里不像lwn网站上的那样还写了rcu lock，又查了下rhashtable_look之类的实现，发现里面好像自带了加锁的操作？于是直接把这些乱七八糟的结构都删了，就没有这样的问题了</p>
+</blockquote>
 
                 
               </div>
