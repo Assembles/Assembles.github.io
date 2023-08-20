@@ -16,22 +16,22 @@
   <meta name="author" content="Dys">
   <meta name="keywords" content="">
   
-    <meta name="description" content="有的时候，某些功能需要向一些指定的文件中写入内容，比如：如果有时候kernel显示BUG: soft lockup - CPU#14 stuck for 22s! [init:1]之类的错误，那么一个可行的方法是 1echo 1 &gt; &#x2F;proc&#x2F;sys&#x2F;kernel&#x2F;softlockup_panic 这样能够让softlockup触发panic，进而能够显示调用栈，从而找到错误但是直接运行会">
+    <meta name="description" content="在平时写内核代码的过程中，用模块进行测试是非常方便的一个方法，但是之前的运行的过程中大部分错误都在编译时就发现了，今天不小心触发了一个运行时的错误，突然发现模块卸载会变得非常困难，于是记录下修复的过程 场景是这样的，在尝试去rmmod一个已经安装的模块的时候，会一直显示 1rmmod: ERROR: Module LRUlist is in use 但是在尝试去卸载的时候，又会显示 1rmmod:">
 <meta property="og:type" content="article">
-<meta property="og:title" content="echo重定向permission denied">
-<meta property="og:url" content="http://example.com/2023/08/15/echo%E9%87%8D%E5%AE%9A%E5%90%91permission-denied/index.html">
+<meta property="og:title" content="kernel模块卸载失败">
+<meta property="og:url" content="http://example.com/2023/08/21/kernel%E6%A8%A1%E5%9D%97%E5%8D%B8%E8%BD%BD%E5%A4%B1%E8%B4%A5/index.html">
 <meta property="og:site_name" content="Dys&#39;s Blog">
-<meta property="og:description" content="有的时候，某些功能需要向一些指定的文件中写入内容，比如：如果有时候kernel显示BUG: soft lockup - CPU#14 stuck for 22s! [init:1]之类的错误，那么一个可行的方法是 1echo 1 &gt; &#x2F;proc&#x2F;sys&#x2F;kernel&#x2F;softlockup_panic 这样能够让softlockup触发panic，进而能够显示调用栈，从而找到错误但是直接运行会">
+<meta property="og:description" content="在平时写内核代码的过程中，用模块进行测试是非常方便的一个方法，但是之前的运行的过程中大部分错误都在编译时就发现了，今天不小心触发了一个运行时的错误，突然发现模块卸载会变得非常困难，于是记录下修复的过程 场景是这样的，在尝试去rmmod一个已经安装的模块的时候，会一直显示 1rmmod: ERROR: Module LRUlist is in use 但是在尝试去卸载的时候，又会显示 1rmmod:">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-08-15T14:11:36.000Z">
-<meta property="article:modified_time" content="2023-08-15T14:26:16.061Z">
+<meta property="article:published_time" content="2023-08-20T17:01:45.000Z">
+<meta property="article:modified_time" content="2023-08-20T17:10:48.697Z">
 <meta property="article:author" content="Dys">
-<meta property="article:tag" content="OS">
+<meta property="article:tag" content="kernel">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>echo重定向permission denied - Dys&#39;s Blog</title>
+  <title>kernel模块卸载失败 - Dys&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -198,7 +198,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="echo重定向permission denied"></span>
+            <span id="subtitle" data-typed-text="kernel模块卸载失败"></span>
           
         </div>
 
@@ -209,8 +209,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-08-15 22:11" pubdate>
-          2023年8月15日 晚上
+        <time datetime="2023-08-21 01:01" pubdate>
+          2023年8月21日 凌晨
         </time>
       </span>
     
@@ -221,7 +221,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          914 字
+          645 字
         
       </span>
     
@@ -232,7 +232,7 @@
         
         
         
-          8 分钟
+          6 分钟
         
       </span>
     
@@ -270,20 +270,21 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">echo重定向permission denied</h1>
+            <h1 style="display: none">kernel模块卸载失败</h1>
             
             
               <div class="markdown-body">
                 
-                <p>有的时候，某些功能需要向一些指定的文件中写入内容，比如：<br>如果有时候kernel显示<code>BUG: soft lockup - CPU#14 stuck for 22s! [init:1]</code>之类的错误，那么一个可行的方法是</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">echo <span class="hljs-number">1</span> &gt; <span class="hljs-regexp">/proc/</span>sys<span class="hljs-regexp">/kernel/</span>softlockup_panic<br></code></pre></td></tr></table></figure>
-<p>这样能够让softlockup触发panic，进而能够显示调用栈，从而找到错误<br>但是直接运行会显示permission denied，即使加上sudo也是这样<br>这是因为重定向功能（也就是“&gt;”）是shell完成的，但是sudo只是给了echo权限，比较容易理解的一种顺序是：<br>shell先调用sudo echo语句，然后echo打印完毕结束之后，superuser shell退出，sudo结束，原始shell将结果收集起来尝试重定向到输出文件，但是权限不足，所以失败（其实详细的流程不是这样，具体过程在文章末给出）<br>所以一种做法就是以root身份登录：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">sudo -<span class="hljs-selector-tag">i</span><br></code></pre></td></tr></table></figure>
-<p>然后就可以直接使用上面提到的指令来让softlockup触发panic了</p>
-<p>事实上，shell可能会先尝试重定向，然后再去尝试前面的指令，如果失败了的话可能连前面的指令都不会去尝试<br>比如一个测试</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs stylus">touch ./onlyroot<span class="hljs-selector-class">.txt</span><br>sudo chown root<span class="hljs-selector-pseudo">:root</span> ./onlyroot<span class="hljs-selector-class">.txt</span><br>sudo bash -c <span class="hljs-string">&quot;whoami | tee who.txt&quot;</span> &gt; onlyroot<span class="hljs-selector-class">.txt</span><br>bash: onlyroot<span class="hljs-selector-class">.txt</span>: Permission denied<br></code></pre></td></tr></table></figure>
-<p>这个测试结果中，因为onlyroot.txt文件的权限问题，who.txt文件就根本没有被创建</p>
-<p>本文参考：<br><a target="_blank" rel="noopener" href="https://askubuntu.com/questions/230476/how-to-solve-permission-denied-when-using-sudo-with-redirection-in-bash">https://askubuntu.com/questions/230476/how-to-solve-permission-denied-when-using-sudo-with-redirection-in-bash</a><br><a target="_blank" rel="noopener" href="https://askubuntu.com/questions/725403/capturing-a-kernel-dump-from-a-cpu-soft-lockup-at-boot">https://askubuntu.com/questions/725403/capturing-a-kernel-dump-from-a-cpu-soft-lockup-at-boot</a></p>
+                <p>在平时写内核代码的过程中，用模块进行测试是非常方便的一个方法，但是之前的运行的过程中大部分错误都在编译时就发现了，今天不小心触发了一个运行时的错误，突然发现模块卸载会变得非常困难，于是记录下修复的过程</p>
+<p>场景是这样的，在尝试去rmmod一个已经安装的模块的时候，会一直显示</p>
+<figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vbnet"><span class="hljs-symbol">rmmod:</span> <span class="hljs-keyword">ERROR</span>: <span class="hljs-keyword">Module</span> LRUlist <span class="hljs-built_in">is</span> <span class="hljs-keyword">in</span> use<br></code></pre></td></tr></table></figure>
+<p>但是在尝试去卸载的时候，又会显示</p>
+<figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vbnet"><span class="hljs-symbol">rmmod:</span> <span class="hljs-keyword">ERROR</span>: <span class="hljs-keyword">Module</span> LRUlist <span class="hljs-built_in">is</span> <span class="hljs-keyword">in</span> use<br></code></pre></td></tr></table></figure>
+<p>打开lsmod一看。。。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">Module</span>                  Size  Used by<br><span class="hljs-attribute">LRUlist</span>                <span class="hljs-number">16384</span>  -<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+<p>虽然不知道这玩意是啥，但是-1肯定不是好东西对吧<br>后来调了下dmesg，发现原来是因为退出LRUlist的过程中不小心释放了空指针，造成了访问地址错误的问题，于是就无法卸载始终处在装载中的状态了<br>具体的解决方法可以参考这个：<a target="_blank" rel="noopener" href="https://blog.csdn.net/gatieme/article/details/75108154">https://blog.csdn.net/gatieme/article/details/75108154</a><br>编译之后按顺序执行</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs 1c">sudo insmod force_rmmod.ko modname=LRUlist<br>dmesg <span class="hljs-string">| tail -l</span><br>sudo rmmod LRUlist<br>dmesg <span class="hljs-string">| tail -l</span><br>sudo rmmod force_rmmod<br>dmesg <span class="hljs-string">| tail -l</span><br>lsmod<br></code></pre></td></tr></table></figure>
+<p>每执行一步，都看看有没有触发新的问题，有可能的情况是没有成功退出又失败了，我这里当时是因为想要替换exit函数又没有声明那个宏定义导致的。<br>这样就可以继续用模块做测试又不怕失败啦！</p>
 
                 
               </div>
@@ -296,7 +297,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/OS/">#OS</a>
+        <a href="/tags/kernel/">#kernel</a>
       
     </div>
   
@@ -308,8 +309,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>echo重定向permission denied</div>
-      <div>http://example.com/2023/08/15/echo重定向permission-denied/</div>
+      <div>kernel模块卸载失败</div>
+      <div>http://example.com/2023/08/21/kernel模块卸载失败/</div>
     </div>
     <div class="license-meta">
       
@@ -321,7 +322,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年8月15日</div>
+          <div>2023年8月21日</div>
         </div>
       
       
@@ -353,18 +354,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2023/08/21/kernel%E6%A8%A1%E5%9D%97%E5%8D%B8%E8%BD%BD%E5%A4%B1%E8%B4%A5/" title="kernel模块卸载失败">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">kernel模块卸载失败</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2023/08/15/kernel-%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/" title="kernel 代码踩坑">
-                        <span class="hidden-mobile">kernel 代码踩坑</span>
+                      <a href="/2023/08/15/echo%E9%87%8D%E5%AE%9A%E5%90%91permission-denied/" title="echo重定向permission denied">
+                        <span class="hidden-mobile">echo重定向permission denied</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

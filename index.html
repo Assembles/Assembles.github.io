@@ -225,6 +225,46 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/2023/08/21/kernel%E6%A8%A1%E5%9D%97%E5%8D%B8%E8%BD%BD%E5%A4%B1%E8%B4%A5/" target="_self">
+          kernel模块卸载失败
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2023/08/21/kernel%E6%A8%A1%E5%9D%97%E5%8D%B8%E8%BD%BD%E5%A4%B1%E8%B4%A5/" target="_self">
+        <div>
+          在平时写内核代码的过程中，用模块进行测试是非常方便的一个方法，但是之前的运行的过程中大部分错误都在编译时就发现了，今天不小心触发了一个运行时的错误，突然发现模块卸载会变得非常困难，于是记录下修复的过程 场景是这样的，在尝试去rmmod一个已经安装的模块的时候，会一直显示 1rmmod: ERROR: Module LRUlist is in use 但是在尝试去卸载的时候，又会显示 1rmmod:
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2023-08-21 01:01" pubdate>
+              2023-08-21
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/kernel/">#kernel</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/2023/08/15/echo%E9%87%8D%E5%AE%9A%E5%90%91permission-denied/" target="_self">
           echo重定向permission denied
         </a>
@@ -273,7 +313,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2023/08/15/kernel-%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/" target="_self">
         <div>
-          刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不支持这么长的
+          刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。 bug#1最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不
         </div>
       </a>
 
@@ -565,46 +605,6 @@
             <i class="iconfont icon-tags"></i>
             
               <a href="/tags/CSAPP/">#CSAPP</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2023/03/31/6-s081-lab8-Lock/" target="_self">
-          6-s081-lab8-Lock
-        </a>
-      </h1>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2023/03/31/6-s081-lab8-Lock/" target="_self">
-        <div>
-          Lock这个实验给我的感觉就是在尝试与锁去妥协，很多场景为了并发的考虑必须去用锁，但是很多自旋锁因为一直在while循环耗时太长，应该就是锁争用导致的阻塞，所以需要许多手段去尽可能减少锁的争用。 Memory allocatorlab1 是针对memory allocator的优化。在kalloctest中之所以会出现争用，最根本的问题就是因为只有一个free list，所有的加锁申请都要申请这
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2023-03-31 14:38" pubdate>
-              2023-03-31
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/OS/">#OS</a>
             
           </div>
         

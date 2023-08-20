@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-08-15T14:26:16.061Z</updated>
+  <updated>2023-08-20T17:10:48.697Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>kernel模块卸载失败</title>
+    <link href="http://example.com/2023/08/21/kernel%E6%A8%A1%E5%9D%97%E5%8D%B8%E8%BD%BD%E5%A4%B1%E8%B4%A5/"/>
+    <id>http://example.com/2023/08/21/kernel%E6%A8%A1%E5%9D%97%E5%8D%B8%E8%BD%BD%E5%A4%B1%E8%B4%A5/</id>
+    <published>2023-08-20T17:01:45.000Z</published>
+    <updated>2023-08-20T17:10:48.697Z</updated>
+    
+    <content type="html"><![CDATA[<p>在平时写内核代码的过程中，用模块进行测试是非常方便的一个方法，但是之前的运行的过程中大部分错误都在编译时就发现了，今天不小心触发了一个运行时的错误，突然发现模块卸载会变得非常困难，于是记录下修复的过程</p><p>场景是这样的，在尝试去rmmod一个已经安装的模块的时候，会一直显示</p><figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vbnet"><span class="hljs-symbol">rmmod:</span> <span class="hljs-keyword">ERROR</span>: <span class="hljs-keyword">Module</span> LRUlist <span class="hljs-built_in">is</span> <span class="hljs-keyword">in</span> use<br></code></pre></td></tr></table></figure><p>但是在尝试去卸载的时候，又会显示</p><figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vbnet"><span class="hljs-symbol">rmmod:</span> <span class="hljs-keyword">ERROR</span>: <span class="hljs-keyword">Module</span> LRUlist <span class="hljs-built_in">is</span> <span class="hljs-keyword">in</span> use<br></code></pre></td></tr></table></figure><p>打开lsmod一看。。。</p><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">Module</span>                  Size  Used by<br><span class="hljs-attribute">LRUlist</span>                <span class="hljs-number">16384</span>  -<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure><p>虽然不知道这玩意是啥，但是-1肯定不是好东西对吧<br>后来调了下dmesg，发现原来是因为退出LRUlist的过程中不小心释放了空指针，造成了访问地址错误的问题，于是就无法卸载始终处在装载中的状态了<br>具体的解决方法可以参考这个：<a href="https://blog.csdn.net/gatieme/article/details/75108154">https://blog.csdn.net/gatieme/article/details/75108154</a><br>编译之后按顺序执行</p><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs 1c">sudo insmod force_rmmod.ko modname=LRUlist<br>dmesg <span class="hljs-string">| tail -l</span><br>sudo rmmod LRUlist<br>dmesg <span class="hljs-string">| tail -l</span><br>sudo rmmod force_rmmod<br>dmesg <span class="hljs-string">| tail -l</span><br>lsmod<br></code></pre></td></tr></table></figure><p>每执行一步，都看看有没有触发新的问题，有可能的情况是没有成功退出又失败了，我这里当时是因为想要替换exit函数又没有声明那个宏定义导致的。<br>这样就可以继续用模块做测试又不怕失败啦！</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;在平时写内核代码的过程中，用模块进行测试是非常方便的一个方法，但是之前的运行的过程中大部分错误都在编译时就发现了，今天不小心触发了一个运行时的错误，突然发现模块卸载会变得非常困难，于是记录下修复的过程&lt;/p&gt;
+&lt;p&gt;场景是这样的，在尝试去rmmod一个已经安装的模块的时候，</summary>
+      
+    
+    
+    
+    
+    <category term="kernel" scheme="http://example.com/tags/kernel/"/>
+    
+  </entry>
   
   <entry>
     <title>echo重定向permission denied</title>
@@ -44,9 +67,9 @@
     <link href="http://example.com/2023/08/15/kernel-%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/"/>
     <id>http://example.com/2023/08/15/kernel-%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/</id>
     <published>2023-08-15T12:02:56.000Z</published>
-    <updated>2023-08-17T13:46:59.552Z</updated>
+    <updated>2023-08-17T13:49:01.373Z</updated>
     
-    <content type="html"><![CDATA[<p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/hollow.jpg" alt="peace &amp; love"><br>刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。<br><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/memcpy_bug.png" alt="memcmp导致内核崩掉"><br>最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不支持这么长的char数组？但是发现其他内核文件虽然没有这么长的，但是大于5的uint8数组也是存在的，而memcmp作为比较的默认方法又怎么会出错呢？后来我又想自己写个方法覆盖掉系统原有的memcmp方法，但是中途作罢了，感觉用处不大。最后结合一些信息，我又猜测可能是rhashtable里面存储的元素的问题，内核栈好像是比较小的，而且经常清空，所以如果我添加栈上的元素的话后来可能在比较的时候就会发现访问的是一段不合法的地址，所以改成kzalloc方法分配新的entry就好啦</p><h3 id="内核栈"><a href="#内核栈" class="headerlink" title="内核栈"></a>内核栈</h3><blockquote><p>在用户空间，我们以前所讨论到的那些分配的例子，不少都可以在栈上发生。因为我们毕竟可以事先知道所分配空间的大小。用户空间能够奢侈地负担起非常大的栈，而且栈空间还可以动态增长，相反，内核却不能这么奢侈——内核栈小而固定。当给每个进程分配一个固定大小的小栈后，不但可以减少内存的消耗，而且内核也无需负担太重的栈管理任务。<br>每个进程的内核栈大小既依赖体系结构，也与编译时的选项有关，历史上，每个进程都有两页的内核栈。因为32位和64位体系结构的页面大小分别是4KB和8KB，所以通常他们的内核栈的大小为8KB和16KB。<br>在任意一个函数中，你都必须尽量节省栈资源。这并不难，也没有什么窍门，只需要在具体的函数中让所有的局部变量所占空间之和不要超过几百字节。在栈上进行大量的静态分配（比如分配大型数组或大型结构体）是很危险的下。要不然，在内核中和在用户空间中进行的栈分配就没有什么区别了。栈溢出时悄无声息，但势必会引起严重的问题。因为内核没有在管理内核栈上做足工作，因此，当栈溢出时，多出的数据就会直接溢出来，覆盖掉紧邻栈堆末端的东西。首先面临考验的就是thread_info结构。在堆栈之外，任何内核数据都可能存在潜在的危险。当栈溢出时，最好的情况是机器宕机，最坏的情况是悄无声息的破坏数据。<br>因此，进行动态分配是一种明智的选择，本章前面有关大块内存的分配就是采用这种方式。<br><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/rcu_bug.png" alt="rcu导致的soft lock"><br>这个也很奇怪，我在单独测试rhashtable的时候还没问题，在加到文件系统的时候就出了问题，后来发现有的博主写的代码里不像lwn网站上的那样还写了rcu lock，又查了下rhashtable_look之类的实现，发现里面好像自带了加锁的操作？于是直接把这些乱七八糟的结构都删了，就没有这样的问题了</p></blockquote>]]></content>
+    <content type="html"><![CDATA[<p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/hollow.jpg" alt="peace &amp; love"><br>刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。</p><h2 id="bug-1"><a href="#bug-1" class="headerlink" title="bug#1"></a>bug#1</h2><p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/memcpy_bug.png" alt="memcmp导致内核崩掉"><br>最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不支持这么长的char数组？但是发现其他内核文件虽然没有这么长的，但是大于5的uint8数组也是存在的，而memcmp作为比较的默认方法又怎么会出错呢？后来我又想自己写个方法覆盖掉系统原有的memcmp方法，但是中途作罢了，感觉用处不大。最后结合一些信息，我又猜测可能是rhashtable里面存储的元素的问题，内核栈好像是比较小的，而且经常清空，所以如果我添加栈上的元素的话后来可能在比较的时候就会发现访问的是一段不合法的地址，所以改成kzalloc方法分配新的entry就好啦</p><h3 id="内核栈"><a href="#内核栈" class="headerlink" title="内核栈"></a>内核栈</h3><blockquote><p>在用户空间，我们以前所讨论到的那些分配的例子，不少都可以在栈上发生。因为我们毕竟可以事先知道所分配空间的大小。用户空间能够奢侈地负担起非常大的栈，而且栈空间还可以动态增长，相反，内核却不能这么奢侈——内核栈小而固定。当给每个进程分配一个固定大小的小栈后，不但可以减少内存的消耗，而且内核也无需负担太重的栈管理任务。<br>每个进程的内核栈大小既依赖体系结构，也与编译时的选项有关，历史上，每个进程都有两页的内核栈。因为32位和64位体系结构的页面大小分别是4KB和8KB，所以通常他们的内核栈的大小为8KB和16KB。<br>在任意一个函数中，你都必须尽量节省栈资源。这并不难，也没有什么窍门，只需要在具体的函数中让所有的局部变量所占空间之和不要超过几百字节。在栈上进行大量的静态分配（比如分配大型数组或大型结构体）是很危险的下。要不然，在内核中和在用户空间中进行的栈分配就没有什么区别了。栈溢出时悄无声息，但势必会引起严重的问题。因为内核没有在管理内核栈上做足工作，因此，当栈溢出时，多出的数据就会直接溢出来，覆盖掉紧邻栈堆末端的东西。首先面临考验的就是thread_info结构。在堆栈之外，任何内核数据都可能存在潜在的危险。当栈溢出时，最好的情况是机器宕机，最坏的情况是悄无声息的破坏数据。<br>因此，进行动态分配是一种明智的选择，本章前面有关大块内存的分配就是采用这种方式。</p></blockquote><h2 id="bug-2"><a href="#bug-2" class="headerlink" title="bug#2"></a>bug#2</h2><p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/rcu_bug.png" alt="rcu导致的soft lock"><br>这个也很奇怪，我在单独测试rhashtable的时候还没问题，在加到文件系统的时候就出了问题，后来发现有的博主写的代码里不像lwn网站上的那样还写了rcu lock，又查了下rhashtable_look之类的实现，发现里面好像自带了加锁的操作？于是直接把这些乱七八糟的结构都删了，就没有这样的问题了</p>]]></content>
     
     
       
@@ -438,28 +461,6 @@
     
     
     <category term="OS" scheme="http://example.com/tags/OS/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>CMU15445-lab4</title>
-    <link href="http://example.com/2023/02/06/CMU15445-lab4/"/>
-    <id>http://example.com/2023/02/06/CMU15445-lab4/</id>
-    <published>2023-02-06T08:00:05.000Z</published>
-    <updated>2023-02-20T17:24:12.537Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="Concurrency-Control"><a href="#Concurrency-Control" class="headerlink" title="Concurrency Control"></a>Concurrency Control</h1><p>这个实验主要就是实现事务上的lock manager，从而能够实现并行的query execution，锁方面需要支持的函数就是上shared lock、exclusive lock、upgrade lock以及解锁</p><h2 id="Task1-Lock-Manager-amp-amp-Task2-Deadlock-Prevention"><a href="#Task1-Lock-Manager-amp-amp-Task2-Deadlock-Prevention" class="headerlink" title="Task1 Lock Manager &amp;&amp; Task2 Deadlock Prevention"></a>Task1 Lock Manager &amp;&amp; Task2 Deadlock Prevention</h2><p>这分成了两个任务，但是这两个任务其实都在同一部分的代码里，需要先考虑下怎么写在一起，因为对并行的理解不是很够，之前多线程的代码写的也不多，这部分主要是参考了别的代码和博客搞定的。<br>遇到锁申请的时候首先根据tuple对应的rid把申请放到相应的LockRequest中，后面对某个tuple的所有锁操作都是基于这个队列来完成的。每次上锁的时候大致有三件事，设置growing状态，在rid的等待队列里加入申请的txn id，在txn的锁集合加入rid，这三个操作就是task1的任务。这里还需要实现隔离等级，具体的隔离等级以及相关的措施如下：<br>READ_UNCOMMITED只有在需要时上写锁。<br>READ_COMMITTED要解决脏读的问题，解决方案就是读时上读锁，读完解读锁；写时上写锁，但等到commit时才解写锁；读时上读锁，读完解读锁。这样，永远不会读到未commit的数据，因为上面有写锁。<br>REPEATABLE_READ进一步打造可重复读。同一事务读两次数据的中途不想被其他事务的写干扰，这就需要用到巧妙的二段封锁协议（2PL）了：事务分为两个阶段（不考虑commit&#x2F;abort），上锁阶段(GROWING)只上锁，解锁阶段(SHINKING)只解锁。这样，第二次读取时，前一次读取的读锁一定还在，避免了中途被修改。<br>task2比较难，需要做死锁预防，用到了wound-wait(“young wait for old”)，这个方法主要的思路就是杀死比当前请求年轻的申请，等待更老的申请,这里看博客上说不需要管granted_字段，直接遍历请求队列，执行上面提到的操作就可以。最关键的数据结构一个是上面提到的LockRequest，另一个是txn中的lockset，将这两部分对照起来就能实现这一部分的死锁预防处理。<br>对于读锁来说，因为其可以共存，所以只需要abort掉新事务的写请求<br>而等待操作较为麻烦，主要需要考虑两方面设计，一方面需要使用条件变量协调多线程，也就是等待的时候wait，unlock的时候notify_all，另外一方面，还需要考虑的一点是在等待结束后当前事务有可能已经被abort掉了，所以还需要单独处理。参考的一些做法是用了goto语句，感觉不太合理，但是这里不再继续深究了，就先保留了</p><h2 id="Task3-Concurrent-Query-Execution"><a href="#Task3-Concurrent-Query-Execution" class="headerlink" title="Task3 Concurrent Query Execution"></a>Task3 Concurrent Query Execution</h2><p>在lab3的基础上加读写锁，有的地方不是很理解，比如insert后才得到rid但是这样就没法对表加锁只能对index加锁，但是也通过了测试。另外还要加上index_write_set的操作，用来回滚，只需要在加索引的时候顺便构造一下就可以了。</p><p>对理解有帮助的一篇博客<a href="https://www.inlighting.org/archives/database-concurrency-control">https://www.inlighting.org/archives/database-concurrency-control</a><br>（总结，还是得随手记录一下，不然最后都忘了<br>（以及，有时间的话最好能看看指定教材和ppt，我只是做项目的时候粗略看了下，感觉应该仔细看看<br>这个项目是关于数据库的一个非常好的项目，这个项目的文档非常完善，测试代码非常详细。不仅项目本身自带的一部分测试，还有大量的在线测试，能够找到代码绝大部分的bug与不符合题目要求的地方。为了一些未通过的测试用例去修改代码是一个锻炼代码能力和加深理解的方式。<br>可惜的是在线测试代码没有开源，找bug只能通过简短的提示自己设计用例来测试，比较耗时间。我断断续续做了差不多两个多月的时间，在做project4时还没有全部完成就到了2023年，对2021年的在线测试已经过期了，这部分的代码还只能通过本地的测试。另外比较可惜的一点是我没有看完教材的所有内容和在线的课程，只是面向这个项目学习了一部分知识，如果有时间的话希望能够再去补充学习一下。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;h1 id=&quot;Concurrency-Control&quot;&gt;&lt;a href=&quot;#Concurrency-Control&quot; class=&quot;headerlink&quot; title=&quot;Concurrency Control&quot;&gt;&lt;/a&gt;Concurrency Control&lt;/h1&gt;&lt;p&gt;这个</summary>
-      
-    
-    
-    
-    
-    <category term="CMU15445" scheme="http://example.com/tags/CMU15445/"/>
     
   </entry>
   
