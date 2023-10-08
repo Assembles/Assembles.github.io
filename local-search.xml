@@ -4,6 +4,44 @@
   
   
   <entry>
+    <title>Unknown symbol in module</title>
+    <link href="/2023/10/08/Unknown-symbol-in-module/"/>
+    <url>/2023/10/08/Unknown-symbol-in-module/</url>
+    
+    <content type="html"><![CDATA[<p>在写模块做测试的时候遇到了很玄学的一个问题：</p><figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs vbnet">sudo insmod smartdedup.ko<br><span class="hljs-symbol">insmod:</span> <span class="hljs-keyword">ERROR</span>: could <span class="hljs-built_in">not</span> insert <span class="hljs-keyword">module</span> smartdedup.ko: Unknown symbol <span class="hljs-keyword">in</span> <span class="hljs-keyword">module</span><br><span class="hljs-symbol">Makefile:</span><span class="hljs-number">17</span>: recipe <span class="hljs-keyword">for</span> target <span class="hljs-comment">&#x27;test&#x27; failed</span><br><span class="hljs-symbol">make:</span> *** [test] <span class="hljs-keyword">Error</span> <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure><p>可以看到，在make的时候失败了，因为有什么不知道的符号<br>去网上搜了下，发现具体的错误会在dmesg里提示，看了之后更疑惑了</p><figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs accesslog"><span class="hljs-string">[4161060.284598]</span> smartdedup: Unknown symbol rhashtable_init (err <span class="hljs-number">0</span>)<br></code></pre></td></tr></table></figure><p>可以看到明明应该被识别到的很普遍的rhashtable_init函数很神奇的无法识别。、</p><p>首先看下内核的符号表：</p><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gradle">cat <span class="hljs-regexp">/proc/</span>kallsyms | <span class="hljs-keyword">grep</span> rhashtable<br></code></pre></td></tr></table></figure><p>可以看到这个函数确实是在符号表里的</p><p>然后我还用了modinfo查看依赖，发现我写的模块确实也是没有依赖的。<br>那么问题到底出现在哪里呢？<br>最后发现是忘了写</p><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs abnf">MODULE_LICENSE(<span class="hljs-string">&quot;GPL&quot;</span>)<span class="hljs-comment">;</span><br></code></pre></td></tr></table></figure><p>应该是因为没有用这个协议，导致这个模块无法使用这个协议约定下暴露出的符号表&#x3D; &#x3D;</p><p>部分参考：<br><a href="https://blog.csdn.net/u014436243/article/details/102860177">https://blog.csdn.net/u014436243/article/details/102860177</a></p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>kernel</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>服务器重启后数据消失</title>
+    <link href="/2023/08/21/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%87%8D%E5%90%AF%E5%90%8E%E6%95%B0%E6%8D%AE%E6%B6%88%E5%A4%B1/"/>
+    <url>/2023/08/21/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%87%8D%E5%90%AF%E5%90%8E%E6%95%B0%E6%8D%AE%E6%B6%88%E5%A4%B1/</url>
+    
+    <content type="html"><![CDATA[<p>一些经常改的项目放在某个自己的服务器的&#x2F;home&#x2F;folder2文件夹下，但是重启后突然发现vscode连不上了，最开始还以为是vscode的配置文件的问题，结果连上别的路径开个命令行发现这个目录里没东西了。。属实是吓了一跳<br>后来仔细想想这也不是什么特殊路径不该消失的，于是上网搜了下相关问题，突然发现有人也遇到过相似的问题，原来是硬盘没挂载<br>可以<code>fdisk -l</code>看看所有的分区，然后<code>df -h</code>看看磁盘的情况，可以发现确实有设备没有挂载</p><p>这是因为之前挂载过，但是是临时的挂载，重启之后挂载就失效了，重新用mount指令挂载下，数据就又出现了</p><p>想要一劳永逸地解决这个问题的话，可以修改&#x2F;etc&#x2F;fstab文件，让其能够开机自动挂载（但是我懒得改了，反正也不怎么重启电脑&#x3D; &#x3D;</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>Linux常见问题</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>kernel模块卸载失败</title>
     <link href="/2023/08/21/kernel%E6%A8%A1%E5%9D%97%E5%8D%B8%E8%BD%BD%E5%A4%B1%E8%B4%A5/"/>
     <url>/2023/08/21/kernel%E6%A8%A1%E5%9D%97%E5%8D%B8%E8%BD%BD%E5%A4%B1%E8%B4%A5/</url>
@@ -46,7 +84,7 @@
     <link href="/2023/08/15/kernel-%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/"/>
     <url>/2023/08/15/kernel-%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/</url>
     
-    <content type="html"><![CDATA[<p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/hollow.jpg" alt="peace &amp; love"><br>刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。</p><h2 id="bug-1"><a href="#bug-1" class="headerlink" title="bug#1"></a>bug#1</h2><p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/memcpy_bug.png" alt="memcmp导致内核崩掉"><br>最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不支持这么长的char数组？但是发现其他内核文件虽然没有这么长的，但是大于5的uint8数组也是存在的，而memcmp作为比较的默认方法又怎么会出错呢？后来我又想自己写个方法覆盖掉系统原有的memcmp方法，但是中途作罢了，感觉用处不大。最后结合一些信息，我又猜测可能是rhashtable里面存储的元素的问题，内核栈好像是比较小的，而且经常清空，所以如果我添加栈上的元素的话后来可能在比较的时候就会发现访问的是一段不合法的地址，所以改成kzalloc方法分配新的entry就好啦</p><h3 id="内核栈"><a href="#内核栈" class="headerlink" title="内核栈"></a>内核栈</h3><blockquote><p>在用户空间，我们以前所讨论到的那些分配的例子，不少都可以在栈上发生。因为我们毕竟可以事先知道所分配空间的大小。用户空间能够奢侈地负担起非常大的栈，而且栈空间还可以动态增长，相反，内核却不能这么奢侈——内核栈小而固定。当给每个进程分配一个固定大小的小栈后，不但可以减少内存的消耗，而且内核也无需负担太重的栈管理任务。<br>每个进程的内核栈大小既依赖体系结构，也与编译时的选项有关，历史上，每个进程都有两页的内核栈。因为32位和64位体系结构的页面大小分别是4KB和8KB，所以通常他们的内核栈的大小为8KB和16KB。<br>在任意一个函数中，你都必须尽量节省栈资源。这并不难，也没有什么窍门，只需要在具体的函数中让所有的局部变量所占空间之和不要超过几百字节。在栈上进行大量的静态分配（比如分配大型数组或大型结构体）是很危险的下。要不然，在内核中和在用户空间中进行的栈分配就没有什么区别了。栈溢出时悄无声息，但势必会引起严重的问题。因为内核没有在管理内核栈上做足工作，因此，当栈溢出时，多出的数据就会直接溢出来，覆盖掉紧邻栈堆末端的东西。首先面临考验的就是thread_info结构。在堆栈之外，任何内核数据都可能存在潜在的危险。当栈溢出时，最好的情况是机器宕机，最坏的情况是悄无声息的破坏数据。<br>因此，进行动态分配是一种明智的选择，本章前面有关大块内存的分配就是采用这种方式。</p></blockquote><h2 id="bug-2"><a href="#bug-2" class="headerlink" title="bug#2"></a>bug#2</h2><p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/rcu_bug.png" alt="rcu导致的soft lock"><br>这个也很奇怪，我在单独测试rhashtable的时候还没问题，在加到文件系统的时候就出了问题，后来发现有的博主写的代码里不像lwn网站上的那样还写了rcu lock，又查了下rhashtable_look之类的实现，发现里面好像自带了加锁的操作？于是直接把这些乱七八糟的结构都删了，就没有这样的问题了</p>]]></content>
+    <content type="html"><![CDATA[<p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/hollow.jpg" alt="peace &amp; love"><br>刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。</p><h2 id="bug-1"><a href="#bug-1" class="headerlink" title="bug#1"></a>bug#1</h2><p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/memcpy_bug.png" alt="memcmp导致内核崩掉"><br>最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不支持这么长的char数组？但是发现其他内核文件虽然没有这么长的，但是大于5的uint8数组也是存在的，而memcmp作为比较的默认方法又怎么会出错呢？后来我又想自己写个方法覆盖掉系统原有的memcmp方法，但是中途作罢了，感觉用处不大。最后结合一些信息，我又猜测可能是rhashtable里面存储的元素的问题，内核栈好像是比较小的，而且经常清空，所以如果我添加栈上的元素的话后来可能在比较的时候就会发现访问的是一段不合法的地址，所以改成kzalloc方法分配新的entry就好啦</p><h3 id="内核栈"><a href="#内核栈" class="headerlink" title="内核栈"></a>内核栈</h3><blockquote><p>在用户空间，我们以前所讨论到的那些分配的例子，不少都可以在栈上发生。因为我们毕竟可以事先知道所分配空间的大小。用户空间能够奢侈地负担起非常大的栈，而且栈空间还可以动态增长，相反，内核却不能这么奢侈——内核栈小而固定。当给每个进程分配一个固定大小的小栈后，不但可以减少内存的消耗，而且内核也无需负担太重的栈管理任务。<br>每个进程的内核栈大小既依赖体系结构，也与编译时的选项有关，历史上，每个进程都有两页的内核栈。因为32位和64位体系结构的页面大小分别是4KB和8KB，所以通常他们的内核栈的大小为8KB和16KB。<br>在任意一个函数中，你都必须尽量节省栈资源。这并不难，也没有什么窍门，只需要在具体的函数中让所有的局部变量所占空间之和不要超过几百字节。在栈上进行大量的静态分配（比如分配大型数组或大型结构体）是很危险的下。要不然，在内核中和在用户空间中进行的栈分配就没有什么区别了。栈溢出时悄无声息，但势必会引起严重的问题。因为内核没有在管理内核栈上做足工作，因此，当栈溢出时，多出的数据就会直接溢出来，覆盖掉紧邻栈堆末端的东西。首先面临考验的就是thread_info结构。在堆栈之外，任何内核数据都可能存在潜在的危险。当栈溢出时，最好的情况是机器宕机，最坏的情况是悄无声息的破坏数据。<br>因此，进行动态分配是一种明智的选择，本章前面有关大块内存的分配就是采用这种方式。</p></blockquote><h2 id="bug-2"><a href="#bug-2" class="headerlink" title="bug#2"></a>bug#2</h2><p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/rcu_bug.png" alt="rcu导致的soft lock"><br>这个也很奇怪，我在单独测试rhashtable的时候还没问题，在加到文件系统的时候就出了问题，后来发现有的博主写的代码里不像lwn网站上的那样还写了rcu lock，又查了下rhashtable_look之类的实现，发现里面好像自带了加锁的操作？于是直接把这些乱七八糟的结构都删了，就没有这样的问题了</p><p><a href="https://stackoverflow.com/questions/29848182/how-to-traverse-page-cache-tree-radix-tree-of-a-file-address-space-in-linux-ke">https://stackoverflow.com/questions/29848182/how-to-traverse-page-cache-tree-radix-tree-of-a-file-address-space-in-linux-ke</a></p>]]></content>
     
     
     

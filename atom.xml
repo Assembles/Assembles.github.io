@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-08-20T17:10:48.697Z</updated>
+  <updated>2023-10-08T14:54:30.847Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,51 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Unknown symbol in module</title>
+    <link href="http://example.com/2023/10/08/Unknown-symbol-in-module/"/>
+    <id>http://example.com/2023/10/08/Unknown-symbol-in-module/</id>
+    <published>2023-10-08T14:47:42.000Z</published>
+    <updated>2023-10-08T14:54:30.847Z</updated>
+    
+    <content type="html"><![CDATA[<p>在写模块做测试的时候遇到了很玄学的一个问题：</p><figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs vbnet">sudo insmod smartdedup.ko<br><span class="hljs-symbol">insmod:</span> <span class="hljs-keyword">ERROR</span>: could <span class="hljs-built_in">not</span> insert <span class="hljs-keyword">module</span> smartdedup.ko: Unknown symbol <span class="hljs-keyword">in</span> <span class="hljs-keyword">module</span><br><span class="hljs-symbol">Makefile:</span><span class="hljs-number">17</span>: recipe <span class="hljs-keyword">for</span> target <span class="hljs-comment">&#x27;test&#x27; failed</span><br><span class="hljs-symbol">make:</span> *** [test] <span class="hljs-keyword">Error</span> <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure><p>可以看到，在make的时候失败了，因为有什么不知道的符号<br>去网上搜了下，发现具体的错误会在dmesg里提示，看了之后更疑惑了</p><figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs accesslog"><span class="hljs-string">[4161060.284598]</span> smartdedup: Unknown symbol rhashtable_init (err <span class="hljs-number">0</span>)<br></code></pre></td></tr></table></figure><p>可以看到明明应该被识别到的很普遍的rhashtable_init函数很神奇的无法识别。、</p><p>首先看下内核的符号表：</p><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gradle">cat <span class="hljs-regexp">/proc/</span>kallsyms | <span class="hljs-keyword">grep</span> rhashtable<br></code></pre></td></tr></table></figure><p>可以看到这个函数确实是在符号表里的</p><p>然后我还用了modinfo查看依赖，发现我写的模块确实也是没有依赖的。<br>那么问题到底出现在哪里呢？<br>最后发现是忘了写</p><figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs abnf">MODULE_LICENSE(<span class="hljs-string">&quot;GPL&quot;</span>)<span class="hljs-comment">;</span><br></code></pre></td></tr></table></figure><p>应该是因为没有用这个协议，导致这个模块无法使用这个协议约定下暴露出的符号表&#x3D; &#x3D;</p><p>部分参考：<br><a href="https://blog.csdn.net/u014436243/article/details/102860177">https://blog.csdn.net/u014436243/article/details/102860177</a></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;在写模块做测试的时候遇到了很玄学的一个问题：&lt;/p&gt;
+&lt;figure class=&quot;highlight vbnet&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=</summary>
+      
+    
+    
+    
+    
+    <category term="kernel" scheme="http://example.com/tags/kernel/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>服务器重启后数据消失</title>
+    <link href="http://example.com/2023/08/21/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%87%8D%E5%90%AF%E5%90%8E%E6%95%B0%E6%8D%AE%E6%B6%88%E5%A4%B1/"/>
+    <id>http://example.com/2023/08/21/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%87%8D%E5%90%AF%E5%90%8E%E6%95%B0%E6%8D%AE%E6%B6%88%E5%A4%B1/</id>
+    <published>2023-08-21T13:24:00.000Z</published>
+    <updated>2023-08-21T13:33:36.202Z</updated>
+    
+    <content type="html"><![CDATA[<p>一些经常改的项目放在某个自己的服务器的&#x2F;home&#x2F;folder2文件夹下，但是重启后突然发现vscode连不上了，最开始还以为是vscode的配置文件的问题，结果连上别的路径开个命令行发现这个目录里没东西了。。属实是吓了一跳<br>后来仔细想想这也不是什么特殊路径不该消失的，于是上网搜了下相关问题，突然发现有人也遇到过相似的问题，原来是硬盘没挂载<br>可以<code>fdisk -l</code>看看所有的分区，然后<code>df -h</code>看看磁盘的情况，可以发现确实有设备没有挂载</p><p>这是因为之前挂载过，但是是临时的挂载，重启之后挂载就失效了，重新用mount指令挂载下，数据就又出现了</p><p>想要一劳永逸地解决这个问题的话，可以修改&#x2F;etc&#x2F;fstab文件，让其能够开机自动挂载（但是我懒得改了，反正也不怎么重启电脑&#x3D; &#x3D;</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;一些经常改的项目放在某个自己的服务器的&amp;#x2F;home&amp;#x2F;folder2文件夹下，但是重启后突然发现vscode连不上了，最开始还以为是vscode的配置文件的问题，结果连上别的路径开个命令行发现这个目录里没东西了。。属实是吓了一跳&lt;br&gt;后来仔细想想这也不是什</summary>
+      
+    
+    
+    
+    
+    <category term="Linux常见问题" scheme="http://example.com/tags/Linux%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/"/>
+    
+  </entry>
   
   <entry>
     <title>kernel模块卸载失败</title>
@@ -67,9 +112,9 @@
     <link href="http://example.com/2023/08/15/kernel-%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/"/>
     <id>http://example.com/2023/08/15/kernel-%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/</id>
     <published>2023-08-15T12:02:56.000Z</published>
-    <updated>2023-08-17T13:49:01.373Z</updated>
+    <updated>2023-09-05T14:07:52.132Z</updated>
     
-    <content type="html"><![CDATA[<p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/hollow.jpg" alt="peace &amp; love"><br>刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。</p><h2 id="bug-1"><a href="#bug-1" class="headerlink" title="bug#1"></a>bug#1</h2><p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/memcpy_bug.png" alt="memcmp导致内核崩掉"><br>最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不支持这么长的char数组？但是发现其他内核文件虽然没有这么长的，但是大于5的uint8数组也是存在的，而memcmp作为比较的默认方法又怎么会出错呢？后来我又想自己写个方法覆盖掉系统原有的memcmp方法，但是中途作罢了，感觉用处不大。最后结合一些信息，我又猜测可能是rhashtable里面存储的元素的问题，内核栈好像是比较小的，而且经常清空，所以如果我添加栈上的元素的话后来可能在比较的时候就会发现访问的是一段不合法的地址，所以改成kzalloc方法分配新的entry就好啦</p><h3 id="内核栈"><a href="#内核栈" class="headerlink" title="内核栈"></a>内核栈</h3><blockquote><p>在用户空间，我们以前所讨论到的那些分配的例子，不少都可以在栈上发生。因为我们毕竟可以事先知道所分配空间的大小。用户空间能够奢侈地负担起非常大的栈，而且栈空间还可以动态增长，相反，内核却不能这么奢侈——内核栈小而固定。当给每个进程分配一个固定大小的小栈后，不但可以减少内存的消耗，而且内核也无需负担太重的栈管理任务。<br>每个进程的内核栈大小既依赖体系结构，也与编译时的选项有关，历史上，每个进程都有两页的内核栈。因为32位和64位体系结构的页面大小分别是4KB和8KB，所以通常他们的内核栈的大小为8KB和16KB。<br>在任意一个函数中，你都必须尽量节省栈资源。这并不难，也没有什么窍门，只需要在具体的函数中让所有的局部变量所占空间之和不要超过几百字节。在栈上进行大量的静态分配（比如分配大型数组或大型结构体）是很危险的下。要不然，在内核中和在用户空间中进行的栈分配就没有什么区别了。栈溢出时悄无声息，但势必会引起严重的问题。因为内核没有在管理内核栈上做足工作，因此，当栈溢出时，多出的数据就会直接溢出来，覆盖掉紧邻栈堆末端的东西。首先面临考验的就是thread_info结构。在堆栈之外，任何内核数据都可能存在潜在的危险。当栈溢出时，最好的情况是机器宕机，最坏的情况是悄无声息的破坏数据。<br>因此，进行动态分配是一种明智的选择，本章前面有关大块内存的分配就是采用这种方式。</p></blockquote><h2 id="bug-2"><a href="#bug-2" class="headerlink" title="bug#2"></a>bug#2</h2><p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/rcu_bug.png" alt="rcu导致的soft lock"><br>这个也很奇怪，我在单独测试rhashtable的时候还没问题，在加到文件系统的时候就出了问题，后来发现有的博主写的代码里不像lwn网站上的那样还写了rcu lock，又查了下rhashtable_look之类的实现，发现里面好像自带了加锁的操作？于是直接把这些乱七八糟的结构都删了，就没有这样的问题了</p>]]></content>
+    <content type="html"><![CDATA[<p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/hollow.jpg" alt="peace &amp; love"><br>刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。</p><h2 id="bug-1"><a href="#bug-1" class="headerlink" title="bug#1"></a>bug#1</h2><p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/memcpy_bug.png" alt="memcmp导致内核崩掉"><br>最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不支持这么长的char数组？但是发现其他内核文件虽然没有这么长的，但是大于5的uint8数组也是存在的，而memcmp作为比较的默认方法又怎么会出错呢？后来我又想自己写个方法覆盖掉系统原有的memcmp方法，但是中途作罢了，感觉用处不大。最后结合一些信息，我又猜测可能是rhashtable里面存储的元素的问题，内核栈好像是比较小的，而且经常清空，所以如果我添加栈上的元素的话后来可能在比较的时候就会发现访问的是一段不合法的地址，所以改成kzalloc方法分配新的entry就好啦</p><h3 id="内核栈"><a href="#内核栈" class="headerlink" title="内核栈"></a>内核栈</h3><blockquote><p>在用户空间，我们以前所讨论到的那些分配的例子，不少都可以在栈上发生。因为我们毕竟可以事先知道所分配空间的大小。用户空间能够奢侈地负担起非常大的栈，而且栈空间还可以动态增长，相反，内核却不能这么奢侈——内核栈小而固定。当给每个进程分配一个固定大小的小栈后，不但可以减少内存的消耗，而且内核也无需负担太重的栈管理任务。<br>每个进程的内核栈大小既依赖体系结构，也与编译时的选项有关，历史上，每个进程都有两页的内核栈。因为32位和64位体系结构的页面大小分别是4KB和8KB，所以通常他们的内核栈的大小为8KB和16KB。<br>在任意一个函数中，你都必须尽量节省栈资源。这并不难，也没有什么窍门，只需要在具体的函数中让所有的局部变量所占空间之和不要超过几百字节。在栈上进行大量的静态分配（比如分配大型数组或大型结构体）是很危险的下。要不然，在内核中和在用户空间中进行的栈分配就没有什么区别了。栈溢出时悄无声息，但势必会引起严重的问题。因为内核没有在管理内核栈上做足工作，因此，当栈溢出时，多出的数据就会直接溢出来，覆盖掉紧邻栈堆末端的东西。首先面临考验的就是thread_info结构。在堆栈之外，任何内核数据都可能存在潜在的危险。当栈溢出时，最好的情况是机器宕机，最坏的情况是悄无声息的破坏数据。<br>因此，进行动态分配是一种明智的选择，本章前面有关大块内存的分配就是采用这种方式。</p></blockquote><h2 id="bug-2"><a href="#bug-2" class="headerlink" title="bug#2"></a>bug#2</h2><p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/rcu_bug.png" alt="rcu导致的soft lock"><br>这个也很奇怪，我在单独测试rhashtable的时候还没问题，在加到文件系统的时候就出了问题，后来发现有的博主写的代码里不像lwn网站上的那样还写了rcu lock，又查了下rhashtable_look之类的实现，发现里面好像自带了加锁的操作？于是直接把这些乱七八糟的结构都删了，就没有这样的问题了</p><p><a href="https://stackoverflow.com/questions/29848182/how-to-traverse-page-cache-tree-radix-tree-of-a-file-address-space-in-linux-ke">https://stackoverflow.com/questions/29848182/how-to-traverse-page-cache-tree-radix-tree-of-a-file-address-space-in-linux-ke</a></p>]]></content>
     
     
       
@@ -410,51 +455,6 @@
       
     <summary type="html">&lt;p&gt;&lt;img src=&quot;/../picture/6.s081lab2/pic2.jpg&quot; alt=&quot;高木镇楼&quot;&gt;&lt;/p&gt;
 &lt;h1 id=&quot;System-calls&quot;&gt;&lt;a href=&quot;#System-calls&quot; class=&quot;headerlink&quot; title=&quot;System</summary>
-      
-    
-    
-    
-    
-    <category term="OS" scheme="http://example.com/tags/OS/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>6.s081-lab1 Util</title>
-    <link href="http://example.com/2023/03/14/6-s081-lab1/"/>
-    <id>http://example.com/2023/03/14/6-s081-lab1/</id>
-    <published>2023-03-13T16:13:41.000Z</published>
-    <updated>2023-03-29T10:44:31.243Z</updated>
-    
-    <content type="html"><![CDATA[<p><img src="/../picture/6.s081lab1/takagi-1.jpg"></p><h2 id="环境配置"><a href="#环境配置" class="headerlink" title="环境配置"></a>环境配置</h2><p>首先要说的是配置部分，其实整个lab的配置还是挺简单的，用的时间不是很多，我是在windows上做的，因为游戏本上之前装的虚拟机给我留下了很不好的印象，现在秉承着简便易用的原则我最开始就想尝试下能不能在wsl上搞<br>wsl安装随便搜搜就能找到，值得注意的是在Microsoft Store中安装的ubuntu版本需要是20.04，因为这个实验需要用到的riscv的一些库好像只支持这个版本，我最开始没仔细看安装的22.04，然后果不其然失败了，然后卸载重装。结果卸载还没卸载干净，还去查了查原因，用了个什么指令才搞好。<br>安装完就很简单了。指导书说可以直接在文件夹路径输入 \wsl$\ 进入根目录，我的电脑上还装了22.04，所以后面还有一项 \wsl$\Ubuntu-20.04\<br>上面这种方案虽然是网站上给出的，但是一个问题是用不了vscode的c&#x2F;c++插件（因为插件没有安装到wsl的环境中去），所以可以先安装个wsl插件，然后在wsl里切到xv6的文件下然后输入<code>code .</code>，这样就会自动建立wsl与vscode之间的连接，最后在wsl的环境里再安装下c&#x2F;c++插件，这样就能使用跳转功能了<br>安装完简简单单换个源，然后装下依赖，make qemu成功就能开始写代码啦！<br>本来其实是想在win11的终端界面用vim写的，但是他自带的vim切多窗口费劲以及回车不自动对齐等用起来很恶心的功能成功地在我写完第一个实验之后就把我劝退了。（话说最开始我还想多坚持一段时间还很用心地改了终端的默认配色来着）后面就是用vscode打开文件夹直接编辑代码了……<br>还有一件很神奇的事情，因为这个project提供的代码仓库没有主分支，只有每个实验对应的分支，所以只会有一个默认的分支，每次只有在向默认分支推送代码的时候才会算github的contribution。这就导致commit代码但是github上的contribution图没有变化。。。有点难定</p><h2 id="正片开始"><a href="#正片开始" class="headerlink" title="正片开始"></a>正片开始</h2><p>第一个实验就是非常经典的util实验了，这个跟我当时做的基本是一样的，但是说实话，现在我在写这个blog的时候刚写完lab4的一部分，但是我觉得我用在实验一的时间是最长的，而且还有一些东西没太搞懂</p><h2 id="Sleep-easy"><a href="#Sleep-easy" class="headerlink" title="Sleep(easy)"></a>Sleep(easy)</h2><h2 id="PingPong-easy"><a href="#PingPong-easy" class="headerlink" title="PingPong(easy)"></a>PingPong(easy)</h2><h2 id="Primes-moderate-x2F-hard"><a href="#Primes-moderate-x2F-hard" class="headerlink" title="Primes(moderate&#x2F;hard)"></a>Primes(moderate&#x2F;hard)</h2><h2 id="Find-moderate"><a href="#Find-moderate" class="headerlink" title="Find(moderate)"></a>Find(moderate)</h2><h2 id="Xargs-moderate"><a href="#Xargs-moderate" class="headerlink" title="Xargs(moderate)"></a>Xargs(moderate)</h2><p>未完待续。。</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;&lt;img src=&quot;/../picture/6.s081lab1/takagi-1.jpg&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;环境配置&quot;&gt;&lt;a href=&quot;#环境配置&quot; class=&quot;headerlink&quot; title=&quot;环境配置&quot;&gt;&lt;/a&gt;环境配置&lt;/h2&gt;&lt;p&gt;首先要说的是配</summary>
-      
-    
-    
-    
-    
-    <category term="OS" scheme="http://example.com/tags/OS/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>OS Project(开新坑)</title>
-    <link href="http://example.com/2023/03/13/OS-Project/"/>
-    <id>http://example.com/2023/03/13/OS-Project/</id>
-    <published>2023-03-13T15:53:39.000Z</published>
-    <updated>2023-03-13T16:11:40.741Z</updated>
-    
-    <content type="html"><![CDATA[<p>从大四到研究生入学以来研究方向一直没定下来，大概就是之前没有特别想做的方向，加上大四一直比较摸鱼，所以迟迟没有定下想做的领域，研究工作现在也只是浮于表面。最近想开始往文件系统方向转一转，感觉这个方向还挺有意思的，所谓万事开头难，操作系统已经是将近两年前学的东西了，现在就是很后悔当时没有多读读写写代码，而且非常可惜的是之前没有搞过操作系统比赛，现在想往这个方向转感觉难度还挺大的。ps.希望最后能顺利毕业&#x3D; &#x3D;</p><p>关于具体想做的内容嘛，现在也只是窥得冰山一角，后面如果我觉得对整体认证足够充足的话再试试整理下写成文字吧</p><p>总之现在自己想了想，比较好的一个起步的项目就是mit的6.s081，一个原因是之前上os的时候做过这个实验，虽然当时基本都是遇到不会的就去搜博客，半做半抄搞完的，但是对这个实验的内容感觉还是非常好的，另一个原因就是xv6算是个比较小型的操作系统了，做实验的时候看看代码也挺好的</p><p>另外为什么要用文字记下来呢？其实我本人是不爱记录东西的，之前高中的时候就不爱整理错题本，感觉非常浪费时间。但是现在回头看看，感觉自己用心做了加上用心整理下收获还是挺大的（也挺有纪念意义的<br>另一个原因是去年年末写的15445的lab给我的触动比较大，去年做15445的时候虽然一方面是为了应付作业的报告，但是做的过程感觉还是挺认真的，但是当时没有及时整理，想着最后一起写还能顺便复习一遍，但是最后写的时候才发现记性太差，都忘记了，而且一旦过了刚刚做完的三分钟热度，后面想写点东西感觉还挺难产的。。。感觉还是得做的时候有时间顺手记一下比较好</p><p>另外ucb的cs162好像也不错，有时间的话可以考虑继续开新坑（但是后面大概率没时间了，搞完这个应该就要开始疯狂看论文了，希望下个月能有点idea</p>]]></content>
-    
-    
-      
-      
-    <summary type="html">&lt;p&gt;从大四到研究生入学以来研究方向一直没定下来，大概就是之前没有特别想做的方向，加上大四一直比较摸鱼，所以迟迟没有定下想做的领域，研究工作现在也只是浮于表面。最近想开始往文件系统方向转一转，感觉这个方向还挺有意思的，所谓万事开头难，操作系统已经是将近两年前学的东西了，现在就是很</summary>
       
     
     
