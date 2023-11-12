@@ -4,6 +4,25 @@
   
   
   <entry>
+    <title>连不上网了</title>
+    <link href="/2023/11/12/%E8%BF%9E%E4%B8%8D%E4%B8%8A%E7%BD%91%E4%BA%86/"/>
+    <url>/2023/11/12/%E8%BF%9E%E4%B8%8D%E4%B8%8A%E7%BD%91%E4%BA%86/</url>
+    
+    <content type="html"><![CDATA[<p>如题，我通常的工作环境配置是一部台式机安装ubuntu server 18版本，一台笔记本ssh连接台式机远程完成大部分工作，台式机和笔记本都在校园网下。另外因为平常做的东西经常需要开femu，也就是模拟器，所以需要在ssh连接的这个“远程”环境里再开一个虚拟机。<br>最近想在虚拟机更新东西的时候，发现连不上网了，但是校园网ssh还是能用的，非常神奇，进一步发现，外面的这个机器也连不上网了。虽然更新东西可以通过ssh传文件解决，但是apt更新或者安装一堆乱七八糟的包的时候还是挺麻烦的。经过多方面的排查，包括但不限于重启网卡、修改dns、查看路由等相关配置文件等，但都无果，最后也没看出来是哪里出了问题，很奇怪…<br>最后实在没有办法的办法是改成了校内的镜像源，总算知道了校内镜像源的重要意义了。。。</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>boring</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Unknown symbol in module</title>
     <link href="/2023/10/08/Unknown-symbol-in-module/"/>
     <url>/2023/10/08/Unknown-symbol-in-module/</url>

@@ -1,3 +1,4 @@
+http://example.com/2023/11/12/%E8%BF%9E%E4%B8%8D%E4%B8%8A%E7%BD%91%E4%BA%86/
 http://example.com/2023/10/08/Unknown-symbol-in-module/
 http://example.com/2023/08/15/kernel-%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/
 http://example.com/2023/08/21/%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%87%8D%E5%90%AF%E5%90%8E%E6%95%B0%E6%8D%AE%E6%B6%88%E5%A4%B1/
@@ -41,3 +42,4 @@ http://example.com/tags/CSAPP/
 http://example.com/tags/simulator/
 http://example.com/tags/kernel/
 http://example.com/tags/Linux%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/
+http://example.com/tags/boring/
