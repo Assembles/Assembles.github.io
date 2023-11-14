@@ -16,26 +16,22 @@
   <meta name="author" content="Dys">
   <meta name="keywords" content="">
   
-    <meta name="description" content="刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。 bug#1最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不">
+    <meta name="description" content="记录下vim中的常规操作 替换写这个的原因就是某次想在vim中用下全局替换，因为之前都是简单的写、保存、删除、搜索之类的操作，很简单的指令就能完成，但替换这种操作还没有用过，查了下发现还有挺多情况的，所以记录下语法 :[addr]s&#x2F;source&#x2F;dst&#x2F;[option]  全局替换 %s&#x2F;str1&#x2F;str2&#x2F;g   用str2替换str">
 <meta property="og:type" content="article">
-<meta property="og:title" content="kernel 代码踩坑">
-<meta property="og:url" content="http://example.com/2023/08/15/kernel-%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/index.html">
+<meta property="og:title" content="vim">
+<meta property="og:url" content="http://example.com/2023/11/14/vim/index.html">
 <meta property="og:site_name" content="Dys&#39;s Blog">
-<meta property="og:description" content="刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。 bug#1最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不">
+<meta property="og:description" content="记录下vim中的常规操作 替换写这个的原因就是某次想在vim中用下全局替换，因为之前都是简单的写、保存、删除、搜索之类的操作，很简单的指令就能完成，但替换这种操作还没有用过，查了下发现还有挺多情况的，所以记录下语法 :[addr]s&#x2F;source&#x2F;dst&#x2F;[option]  全局替换 %s&#x2F;str1&#x2F;str2&#x2F;g   用str2替换str">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/hollow.jpg">
-<meta property="og:image" content="http://example.com/picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/memcpy_bug.png">
-<meta property="og:image" content="http://example.com/picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/rcu_bug.png">
-<meta property="article:published_time" content="2023-08-15T12:02:56.000Z">
-<meta property="article:modified_time" content="2023-11-14T12:15:48.306Z">
+<meta property="article:published_time" content="2023-11-14T11:48:32.000Z">
+<meta property="article:modified_time" content="2023-11-14T11:58:18.506Z">
 <meta property="article:author" content="Dys">
-<meta property="article:tag" content="kernel">
+<meta property="article:tag" content="skill">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/hollow.jpg">
   
   
   
-  <title>kernel 代码踩坑 - Dys&#39;s Blog</title>
+  <title>vim - Dys&#39;s Blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -196,13 +192,13 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/hollow.jpg') no-repeat center center; background-size: cover;">
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="kernel 代码踩坑"></span>
+            <span id="subtitle" data-typed-text="vim"></span>
           
         </div>
 
@@ -213,8 +209,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-08-15 20:02" pubdate>
-          2023年8月15日 晚上
+        <time datetime="2023-11-14 19:48" pubdate>
+          2023年11月14日 晚上
         </time>
       </span>
     
@@ -225,7 +221,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.6k 字
+          376 字
         
       </span>
     
@@ -236,7 +232,7 @@
         
         
         
-          14 分钟
+          4 分钟
         
       </span>
     
@@ -274,22 +270,21 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">kernel 代码踩坑</h1>
+            <h1 style="display: none">vim</h1>
             
             
               <div class="markdown-body">
                 
-                <p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/hollow.jpg" srcset="/img/loading.gif" lazyload alt="peace &amp; love"><br>刚开始尝试写内核代码，上来就是诡异的bug，因为最开始还没配好debug环境，硬是连蒙带猜搞定的bug。。。</p>
-<h2 id="bug-1"><a href="#bug-1" class="headerlink" title="bug#1"></a>bug#1</h2><p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/memcpy_bug.png" srcset="/img/loading.gif" lazyload alt="memcmp导致内核崩掉"><br>最开始很疑惑，rhashtable明明是封装好的东西，内部的实现差不多就是根据key算个哈希值分桶，然后再存进去，这个错误里显示的明明就是rhashtable在lookup的过程中因为比较char数组类型的key值而产生了错误。这就让我感到非常疑惑，最开始猜测的方向是：也许内核不支持这么长的char数组？但是发现其他内核文件虽然没有这么长的，但是大于5的uint8数组也是存在的，而memcmp作为比较的默认方法又怎么会出错呢？后来我又想自己写个方法覆盖掉系统原有的memcmp方法，但是中途作罢了，感觉用处不大。最后结合一些信息，我又猜测可能是rhashtable里面存储的元素的问题，内核栈好像是比较小的，而且经常清空，所以如果我添加栈上的元素的话后来可能在比较的时候就会发现访问的是一段不合法的地址，所以改成kzalloc方法分配新的entry就好啦</p>
-<h3 id="内核栈"><a href="#内核栈" class="headerlink" title="内核栈"></a>内核栈</h3><blockquote>
-<p>在用户空间，我们以前所讨论到的那些分配的例子，不少都可以在栈上发生。因为我们毕竟可以事先知道所分配空间的大小。用户空间能够奢侈地负担起非常大的栈，而且栈空间还可以动态增长，相反，内核却不能这么奢侈——内核栈小而固定。当给每个进程分配一个固定大小的小栈后，不但可以减少内存的消耗，而且内核也无需负担太重的栈管理任务。<br>每个进程的内核栈大小既依赖体系结构，也与编译时的选项有关，历史上，每个进程都有两页的内核栈。因为32位和64位体系结构的页面大小分别是4KB和8KB，所以通常他们的内核栈的大小为8KB和16KB。<br>在任意一个函数中，你都必须尽量节省栈资源。这并不难，也没有什么窍门，只需要在具体的函数中让所有的局部变量所占空间之和不要超过几百字节。在栈上进行大量的静态分配（比如分配大型数组或大型结构体）是很危险的下。要不然，在内核中和在用户空间中进行的栈分配就没有什么区别了。栈溢出时悄无声息，但势必会引起严重的问题。因为内核没有在管理内核栈上做足工作，因此，当栈溢出时，多出的数据就会直接溢出来，覆盖掉紧邻栈堆末端的东西。首先面临考验的就是thread_info结构。在堆栈之外，任何内核数据都可能存在潜在的危险。当栈溢出时，最好的情况是机器宕机，最坏的情况是悄无声息的破坏数据。<br>因此，进行动态分配是一种明智的选择，本章前面有关大块内存的分配就是采用这种方式。</p>
-</blockquote>
-<h2 id="bug-2"><a href="#bug-2" class="headerlink" title="bug#2"></a>bug#2</h2><p><img src="/../picture/kernel%E4%BB%A3%E7%A0%81%E8%B8%A9%E5%9D%91/rcu_bug.png" srcset="/img/loading.gif" lazyload alt="rcu导致的soft lock"><br>这个也很奇怪，我在单独测试rhashtable的时候还没问题，在加到文件系统的时候就出了问题，后来发现有的博主写的代码里不像lwn网站上的那样还写了rcu lock，又查了下rhashtable_look之类的实现，发现里面好像自带了加锁的操作？于是直接把这些乱七八糟的结构都删了，就没有这样的问题了</p>
-<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/29848182/how-to-traverse-page-cache-tree-radix-tree-of-a-file-address-space-in-linux-ke">https://stackoverflow.com/questions/29848182/how-to-traverse-page-cache-tree-radix-tree-of-a-file-address-space-in-linux-ke</a></p>
-<h2 id="kernel-oops调试方法"><a href="#kernel-oops调试方法" class="headerlink" title="kernel oops调试方法"></a>kernel oops调试方法</h2><p>比如最简单的NULL pointer oops<br>首先需要在makefile文件里加上调试选项</p>
-<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey">EXTR<span class="hljs-built_in">A_CFLAGS</span> += -g<br></code></pre></td></tr></table></figure>
-<p>这样重新编译出来的结果就是包含debug信息的<br>最关键的就是IP  callback_trace 大概知道在哪一行出错，gdb调试还没有试，只是尝试了下objdump反汇编<br>objdump -S xx.ko &gt; temp<br>然后查看temp文件，到对应的行去看出现错误的位置对应的源码是什么</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/wgl307293845/article/details/109767808">https://blog.csdn.net/wgl307293845/article/details/109767808</a><br><a target="_blank" rel="noopener" href="https://kernel.blog.csdn.net/article/details/73715860">https://kernel.blog.csdn.net/article/details/73715860</a></p>
+                <p>记录下vim中的常规操作</p>
+<h2 id="替换"><a href="#替换" class="headerlink" title="替换"></a>替换</h2><p>写这个的原因就是某次想在vim中用下全局替换，因为之前都是简单的写、保存、删除、搜索之类的操作，很简单的指令就能完成，但替换这种操作还没有用过，查了下发现还有挺多情况的，所以记录下<br>语法 :[addr]s&#x2F;source&#x2F;dst&#x2F;[option]</p>
+<ul>
+<li>全局替换 %s&#x2F;str1&#x2F;str2&#x2F;g   用str2替换str1</li>
+<li>局部替换 20,30s&#x2F;str1&#x2F;str2</li>
+<li>当前行替换 s&#x2F;str1&#x2F;str2&#x2F;g</li>
+<li>手动替换 搜索，cw指令输入替换的字符串，esc退出，n切换到下一个，重复替换.，重复</li>
+</ul>
+<p>addr表示检索范围，省略表示当前行，%表示整个文件，与“1,$”等价，“.,$”表示当前行到文件末尾，s表示替换操作，g表示全局替换，c表示进行确认</p>
+<p>待续~</p>
 
                 
               </div>
@@ -302,7 +297,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/kernel/">#kernel</a>
+        <a href="/tags/skill/">#skill</a>
       
     </div>
   
@@ -314,8 +309,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>kernel 代码踩坑</div>
-      <div>http://example.com/2023/08/15/kernel-代码踩坑/</div>
+      <div>vim</div>
+      <div>http://example.com/2023/11/14/vim/</div>
     </div>
     <div class="license-meta">
       
@@ -327,7 +322,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年8月15日</div>
+          <div>2023年11月14日</div>
         </div>
       
       
@@ -359,18 +354,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2023/08/15/echo%E9%87%8D%E5%AE%9A%E5%90%91permission-denied/" title="echo重定向permission denied">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">echo重定向permission denied</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2023/08/08/%E5%AD%A6%E4%B8%8BRCU/" title="学下RCU">
-                        <span class="hidden-mobile">学下RCU</span>
+                      <a href="/2023/11/12/%E8%BF%9E%E4%B8%8D%E4%B8%8A%E7%BD%91%E4%BA%86/" title="连不上网了">
+                        <span class="hidden-mobile">连不上网了</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
